@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -17,14 +19,24 @@ public class JwtService {
     @Value("${app.jwt-key}")
     private String SECRET;
 
-    public String generateToken(UserDetails userDetails){
+    @Value("${app.jwt-expiration-ms}") // ឧ. កំណត់ក្នុង application.properties (ឧទាហរណ៍ 3600000 សម្រាប់ ១ ម៉ោង)
+    private long jwtExpirationMs;
+
+    // Method ដែលមានការបន្ថែម Custom Claims
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
+    }
+
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
+                .setClaims(extraClaims) // បញ្ចូល Claims បន្ថែម (ឧ. Roles, BranchID) មុននឹងបញ្ចូល Subject
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // ប្រើតម្លៃពី Config
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -39,10 +51,19 @@ public class JwtService {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = Jwts.parser().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
+        final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    private Key getSignKey(){
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser() // ប្រើ parserBuilder() ក្នុងកំណែ jjwt ថ្មី (០.១១.x ឡើងទៅ)
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    private Key getSignKey() {
         byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
