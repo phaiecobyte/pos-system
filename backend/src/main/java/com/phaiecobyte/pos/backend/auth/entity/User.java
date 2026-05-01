@@ -2,16 +2,14 @@ package com.phaiecobyte.pos.backend.auth.entity;
 
 import com.phaiecobyte.pos.backend.core.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "t_auth_user")
@@ -36,11 +34,34 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "is_active")
     private boolean active = true;
 
+
+    // បង្កើតតារាងកណ្តាល user_roles ដោយស្វ័យប្រវត្តិ
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "t_auth_user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<Role> roles;
+
+
+
+    // ការ Mapping យក Roles និង Permissions បញ្ចូលគ្នាដើម្បីឱ្យ Spring Security ស្គាល់
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getRoleName()));
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        for (Role role : roles) {
+            // បន្ថែម Role ចូល (ត្រូវមានពាក្យ ROLE_ នៅខាងមុខ)
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+            // បន្ថែម Permissions ទាំងអស់របស់ Role នោះចូល
+            for (Permission permission : role.getPermissions()) {
+                authorities.add(new SimpleGrantedAuthority(permission.getName()));
+            }
+        }
+        return authorities;
     }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;
