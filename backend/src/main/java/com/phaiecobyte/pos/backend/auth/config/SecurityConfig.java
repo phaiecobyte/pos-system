@@ -31,7 +31,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // បើកដំណើរការ CORS
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        // អនុញ្ញាតឱ្យហៅ Login, Register និង Refresh-Token ដោយមិនបាច់មាន Token
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh-token").permitAll()
+                        // រាល់ Request ផ្សេងៗ (រួមទាំង /logout ផងដែរ) ត្រូវតែមាន Access Token
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

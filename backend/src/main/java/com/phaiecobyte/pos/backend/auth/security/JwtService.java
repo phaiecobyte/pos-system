@@ -5,13 +5,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -19,12 +18,22 @@ public class JwtService {
     @Value("${app.jwt-key}")
     private String SECRET;
 
-    @Value("${app.jwt-expiration-ms}") // ឧ. កំណត់ក្នុង application.properties (ឧទាហរណ៍ 3600000 សម្រាប់ ១ ម៉ោង)
+    @Value("${app.jwt-expiration-ms}")
     private long jwtExpirationMs;
+
+    @Value("${app.jwt-refresh-expiration-ms}")
+    private long refreshExpirationMs;
 
     // Method ដែលមានការបន្ថែម Custom Claims
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+        // បញ្ចូល Roles ទៅក្នុង Claims
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        extraClaims.put("roles", roles);
+        return generateToken(extraClaims, userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
@@ -35,6 +44,10 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // ប្រើតម្លៃពី Config
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String generateRefreshToken(){
+        return UUID.randomUUID().toString();
     }
 
     public String extractUsername(String token) {

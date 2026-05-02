@@ -2,13 +2,17 @@ package com.phaiecobyte.pos.backend.auth.controller;
 
 import com.phaiecobyte.pos.backend.auth.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
+import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenRequest;
 import com.phaiecobyte.pos.backend.auth.dto.RegisterRequest;
+import com.phaiecobyte.pos.backend.auth.entity.User;
 import com.phaiecobyte.pos.backend.auth.service.AuthServiceImpl;
 import com.phaiecobyte.pos.backend.core.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.exception.AppException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,5 +32,27 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest req){
         return ResponseEntity.ok(authService.register(req));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refreshToken(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(@AuthenticationPrincipal User currentUser) {
+        if (currentUser == null) {
+            throw new AppException(HttpStatus.UNAUTHORIZED, "មិនមានសិទ្ធិអនុញ្ញាតទេ!");
+        }
+
+        authService.logout(currentUser);
+
+        // ប្រើ ApiResponse ដែលអ្នកមានស្រាប់ ដើម្បីឆ្លើយតបទៅ Frontend
+        ApiResponse<String> response = ApiResponse.<String>builder()
+                .status(HttpStatus.OK.value())
+                .message("ចាកចេញពីប្រព័ន្ធបានជោគជ័យ!")
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 }
