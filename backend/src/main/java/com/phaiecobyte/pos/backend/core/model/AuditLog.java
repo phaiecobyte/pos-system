@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.core.entity;
+package com.phaiecobyte.pos.backend.core.model;
 
 import com.phaiecobyte.pos.backend.core.base.BaseEntity;
 import jakarta.persistence.Column;
