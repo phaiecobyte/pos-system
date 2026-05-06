@@ -16,16 +16,22 @@ import java.util.Set;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@ToString(exclude = "password")
 public class User extends BaseEntity implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)
+    @ToString.Exclude
     private String password; //encrypt password
 
     @Column(nullable = false)
     private String fullName;
+
+    @Column(unique = true)
+    private String email;
 
 
     @Column(name = "is_active")
@@ -51,7 +57,8 @@ public class User extends BaseEntity implements UserDetails {
         Set<GrantedAuthority> authorities = new HashSet<>();
         for (Role role : roles) {
             // បន្ថែម Role ចូល (ត្រូវមានពាក្យ ROLE_ នៅខាងមុខ)
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
+            String roleName = role.getName().startsWith("ROLE_") ? role.getName() : "ROLE_" + role.getName();
+            authorities.add(new SimpleGrantedAuthority(roleName));
             // បន្ថែម Permissions ទាំងអស់របស់ Role នោះចូល
             for (Permission permission : role.getPermissions()) {
                 authorities.add(new SimpleGrantedAuthority(permission.getName()));

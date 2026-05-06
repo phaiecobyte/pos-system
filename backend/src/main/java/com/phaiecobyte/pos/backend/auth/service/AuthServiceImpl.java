@@ -91,23 +91,27 @@ public class AuthServiceImpl implements AuthService{
             throw new AppException(HttpStatus.BAD_REQUEST, "Username is existed!");
         }
 
-        // ២. រកមើល Role នៅក្នុង Database
+        // ២. ពិនិត្យមើលថាតើ Email នេះមានអ្នកប្រើហើយឬនៅ?
+        if (request.getEmail() != null && userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Email is already in use!");
+        }
+
+        // ៣. រកមើល Role នៅក្នុង Database
         String assignRole = (request.getRoleName() != null && !request.getRoleName().isEmpty())
                 ? request.getRoleName() : "CASHIER";
 
         Role userRole = roleRepository.findByName(assignRole)
                 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, "Role not found!: " + assignRole));
 
-        // ៣. បង្កើត Entity User ថ្មី
-        var user = new User();
-        user.setFullName(request.getFullName());
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        // ៤. កំណត់ Role ជា Set ជំនួសឱ្យ Object តែមួយ
-        user.setRoles(Set.of(userRole)); // <--- ប្រើ Set.of() ដើម្បីខ្ចប់ Role ចូលក្នុង Set
-
-        user.setActive(true);
+        // ៤. បង្កើត Entity User ថ្មី
+        User user = User.builder()
+                .fullName(request.getFullName())
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .roles(Set.of(userRole))
+                .active(true)
+                .build();
 
         // ៥. Save ចូល Database
         userRepository.save(user);
