@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.core.controller;
 
+import com.phaiecobyte.pos.backend.core.base.ApiResponse;
 import com.phaiecobyte.pos.backend.core.dto.CategoryReq;
 import com.phaiecobyte.pos.backend.core.dto.CategoryRes;
 import com.phaiecobyte.pos.backend.core.service.CategoryService;
@@ -19,31 +20,46 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @PostMapping
-    public ResponseEntity<CategoryRes> createCategory(@Valid @RequestBody CategoryReq request) {
-        return new ResponseEntity<>(categoryService.createCategory(request), HttpStatus.CREATED);
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<CategoryRes>> createCategory(@Valid @RequestBody CategoryReq request) {
+        CategoryRes data = categoryService.createCategory(request);
+        return new ResponseEntity<>(
+                ApiResponse.success(data, "បង្កើតប្រភេទចំណាត់ថ្នាក់ថ្មីបានជោគជ័យ!"),
+                HttpStatus.CREATED
+        );
     }
 
-    @GetMapping
-    public ResponseEntity<List<CategoryRes>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<List<CategoryRes>>> getAllCategories() {
+        List<CategoryRes> data = categoryService.getAllCategories();
+        return ResponseEntity.ok(
+                ApiResponse.success(data, "ទាញយកបញ្ជីចំណាត់ថ្នាក់បានជោគជ័យ")
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryRes> getCategoryById(@PathVariable UUID id) {
-        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    public ResponseEntity<ApiResponse<CategoryRes>> getCategoryById(@PathVariable UUID id) {
+        CategoryRes data = categoryService.getCategoryById(id);
+        return ResponseEntity.ok(
+                ApiResponse.success(data, "ទាញយកព័ត៌មានចំណាត់ថ្នាក់បានជោគជ័យ")
+        );
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CategoryRes> updateCategory(
-            @PathVariable UUID id, 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ApiResponse<CategoryRes>> updateCategory(
+            @PathVariable UUID id,
             @Valid @RequestBody CategoryReq request) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, request));
+        CategoryRes data = categoryService.updateCategory(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.success(data, "ធ្វើបច្ចុប្បន្នភាពចំណាត់ថ្នាក់បានជោគជ័យ")
+        );
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable UUID id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.success(null, "បានលុបចំណាត់ថ្នាក់ចេញពីប្រព័ន្ធដោយជោគជ័យ")
+        );
     }
 }

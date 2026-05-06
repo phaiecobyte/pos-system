@@ -15,6 +15,7 @@ public class ProductRes {
     private boolean stockable;
     private Integer currentStock;
     private boolean active;
+    private String imageUrl;
 
     // ចំណុចសំខាន់៖ យើងបញ្ជូនទៅ Frontend តែ ID និង ឈ្មោះ Category បានហើយ
     private UUID categoryId;

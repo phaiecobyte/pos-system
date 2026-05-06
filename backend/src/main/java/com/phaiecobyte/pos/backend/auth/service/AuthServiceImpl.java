@@ -125,17 +125,14 @@ public class AuthServiceImpl implements AuthService{
     // បន្ថែមចូលក្នុង AuthServiceImpl.java
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         return refreshTokenRepository.findByToken(request.getRefreshToken())
-                .map(this::verifyExpiration) // ឆែកមើលថាផុតកំណត់ឬនៅ
+                .map(this::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
-                    // បើនៅមានសុពលភាព បង្កើត Access Token ថ្មី
                     String accessToken = jwtService.generateToken(user);
-                    return AuthResponse.builder()
-                            .accessToken(accessToken)
-                            .refreshToken(request.getRefreshToken())
-                            .build();
+                    // ផ្លាស់ប្តូរត្រង់នេះ: កុំ return ResponseEntity ក្នុង Service
+                    return new AuthResponse(accessToken, request.getRefreshToken());
                 })
-                .orElseThrow(() -> new AppException(HttpStatus.FORBIDDEN, "Refresh token is invalid or expired! Please login again."));
+                .orElseThrow(() -> new AppException(HttpStatus.FORBIDDEN, "Refresh token is invalid or expired!"));
     }
 
     private RefreshToken verifyExpiration(RefreshToken token) {

@@ -11,10 +11,12 @@ import com.phaiecobyte.pos.backend.core.repository.ProductRepository;
 import com.phaiecobyte.pos.backend.core.repository.StockTransactionRepository;
 import com.phaiecobyte.pos.backend.core.service.StockService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j // បន្ថែម Logger ដើម្បីតាមដានប្រតិបត្តិការសំខាន់ៗ
 @Service
 @RequiredArgsConstructor
 public class StockServiceImpl implements StockService {
@@ -24,42 +26,41 @@ public class StockServiceImpl implements StockService {
     private final ProductMapper productMapper;
 
     @Override
-    @Transactional // ធានាសុវត្ថិភាពទិន្នន័យ (All or Nothing)
+    @Transactional
     public ProductRes processStock(StockReq request) {
-        
-        // ១. ស្វែងរកទំនិញ
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញទំនិញនេះទេ!"));
 
-        // ២. ឆែកមើលថាតើទំនិញនេះអនុញ្ញាតឱ្យកាត់ស្តុកឬទេ? (បើជាកាហ្វេ មិនអាចបញ្ជូលស្តុកបានទេ)
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> {
+                    log.error("ប្រតិបត្តិការស្តុកបរាជ័យ - រកមិនឃើញទំនិញ ID: {}", request.getProductId());
+                    return new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញទំនិញនេះទេ!");
+                });
+
         if (!product.isStockable()) {
+            log.warn("ប៉ុនប៉ងកាត់ស្តុកទំនិញដែលមិនមានស្តុក: {}", product.getName());
             throw new AppException(HttpStatus.BAD_REQUEST, "ទំនិញនេះមិនមែនជាប្រភេទកាត់ស្តុកទេ (Non-stockable)!");
         }
 
-        // ៣. គណនាស្តុកថ្មី
         int currentStock = product.getCurrentStock() != null ? product.getCurrentStock() : 0;
-        
+
         if (request.getType() == TransactionType.IN || request.getType() == TransactionType.ADJUSTMENT) {
             product.setCurrentStock(currentStock + request.getQuantity());
+            log.info("បញ្ចូលស្តុកចំនួន {} ទៅឱ្យទំនិញ {} - ស្តុកថ្មី: {}", request.getQuantity(), product.getName(), product.getCurrentStock());
         } else if (request.getType() == TransactionType.OUT || request.getType() == TransactionType.SALE) {
-            // ឆែកកុំឱ្យកាត់ស្តុកដល់អវិជ្ជមាន
             if (currentStock < request.getQuantity()) {
+                log.error("ស្តុកមិនគ្រប់គ្រាន់សម្រាប់ទំនិញ {} - មាន: {}, ស្នើសុំដក: {}", product.getName(), currentStock, request.getQuantity());
                 throw new AppException(HttpStatus.BAD_REQUEST, "ចំនួនស្តុកក្នុងប្រព័ន្ធមិនគ្រប់គ្រាន់សម្រាប់ដកចេញទេ!");
             }
             product.setCurrentStock(currentStock - request.getQuantity());
+            log.info("ដកស្តុកចំនួន {} ពីទំនិញ {} - ស្តុកសល់: {}", request.getQuantity(), product.getName(), product.getCurrentStock());
         }
 
-        // ៤. កត់ត្រាចូលក្នុងប្រវត្តិ StockTransaction
         StockTransaction transaction = new StockTransaction();
         transaction.setProduct(product);
         transaction.setType(request.getType());
         transaction.setQuantity(request.getQuantity());
         transaction.setRemark(request.getRemark());
-        
+
         stockTransactionRepository.save(transaction);
-        
-        // ៥. Update ទំនិញ និងបញ្ជូនទិន្នន័យថ្មីទៅ Frontend
-        product = productRepository.save(product);
-        return productMapper.toResponse(product);
+        return productMapper.toResponse(productRepository.save(product));
     }
 }

@@ -24,4 +24,6 @@ public class ProductReq {
 
     @NotNull(message = "ត្រូវតែជ្រើសរើសប្រភេទ (Category)")
     private UUID categoryId;
+
+    private String imageUrl;
 }

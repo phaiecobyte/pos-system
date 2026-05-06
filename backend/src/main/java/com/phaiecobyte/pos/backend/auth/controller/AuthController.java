@@ -42,15 +42,14 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(@AuthenticationPrincipal User currentUser) {
         if (currentUser == null) {
-            throw new AppException(HttpStatus.UNAUTHORIZED, "មិនមានសិទ្ធិអនុញ្ញាតទេ!");
+            throw new AppException(HttpStatus.UNAUTHORIZED, "Unauthorize!");
         }
 
         authService.logout(currentUser);
 
-        // ប្រើ ApiResponse ដែលអ្នកមានស្រាប់ ដើម្បីឆ្លើយតបទៅ Frontend
         ApiResponse<String> response = ApiResponse.<String>builder()
                 .status(HttpStatus.OK.value())
-                .message("ចាកចេញពីប្រព័ន្ធបានជោគជ័យ!")
+                .message("Logout successfully!")
                 .build();
 
         return ResponseEntity.ok(response);

@@ -21,9 +21,6 @@ public class JwtService {
     @Value("${app.jwt-expiration-ms}")
     private long jwtExpirationMs;
 
-    @Value("${app.jwt-refresh-expiration-ms}")
-    private long refreshExpirationMs;
-
     // Method ដែលមានការបន្ថែម Custom Claims
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> extraClaims = new HashMap<>();

@@ -34,7 +34,7 @@ public class Product extends BaseEntity {
 
     // ចំនួនក្នុងស្តុកបច្ចុប្បន្ន (ប្រើសម្រាប់តែទំនិញ stockable = true)
     @Column(name = "current_stock")
-    private Integer currentStock = 0;
+    private Integer currentStock;
 
     @Column(name = "is_active")
     private boolean active = true;
@@ -43,4 +43,7 @@ public class Product extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 }
