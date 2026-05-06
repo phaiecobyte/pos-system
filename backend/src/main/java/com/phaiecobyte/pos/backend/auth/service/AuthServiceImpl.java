@@ -4,14 +4,17 @@ import com.phaiecobyte.pos.backend.auth.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
 import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenRequest;
 import com.phaiecobyte.pos.backend.auth.dto.RegisterRequest;
+import com.phaiecobyte.pos.backend.auth.entity.InvalidatedToken;
 import com.phaiecobyte.pos.backend.auth.entity.RefreshToken;
 import com.phaiecobyte.pos.backend.auth.entity.Role;
 import com.phaiecobyte.pos.backend.auth.entity.User;
+import com.phaiecobyte.pos.backend.auth.repository.InvalidatedTokenRepository;
 import com.phaiecobyte.pos.backend.auth.repository.RefreshTokenRepository;
 import com.phaiecobyte.pos.backend.auth.repository.RoleRepository;
 import com.phaiecobyte.pos.backend.auth.repository.UserRepository;
 import com.phaiecobyte.pos.backend.auth.security.JwtService;
 import com.phaiecobyte.pos.backend.core.exception.AppException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -25,12 +28,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService{
 
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -121,9 +126,30 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     @Transactional
-    public void logout(User user) {
-        //លុប Refresh Token របស់់ User នេះចេញពី Database
+    public void logout(User user, HttpServletRequest request) {
+        // ១. លុប Refresh Token ចេញពី Database ដូចមុន
         refreshTokenRepository.deleteByUser(user);
+
+        // ២. ទាញយក Access Token ពី Request Header
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.toLowerCase().startsWith("bearer ")) {
+            String jwt = authHeader.substring(7);
+
+            try {
+                // ៣. ទាញយកថ្ងៃផុតកំណត់ (Expiration Date) ពី Token នោះ
+                Date expirationDate = jwtService.extractExpiration(jwt); // អ្នកត្រូវបង្កើត method នេះក្នុង JwtService បើមិនទាន់មាន
+
+                // ៤. បញ្ចូល Token នោះទៅក្នុង Blacklist (InvalidatedToken)
+                InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                        .id(jwt)
+                        .expiryTime(expirationDate)
+                        .build();
+
+                invalidatedTokenRepository.save(invalidatedToken);
+            } catch (Exception e) {
+                // បើ Token ហ្នឹងខូចស្រាប់ ឬផុតកំណត់ស្រាប់ហើយ យើងមិនបាច់ធ្វើអីទេ គ្រាន់តែ Ignore វាទៅ
+            }
+        }
     }
 
     // បន្ថែមចូលក្នុង AuthServiceImpl.java

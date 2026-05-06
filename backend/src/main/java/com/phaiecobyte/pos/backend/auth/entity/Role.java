@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.phaiecobyte.pos.backend.core.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +19,7 @@ public class Role extends BaseEntity {
     private String description;
 
     // បង្កើតតារាងកណ្តាល role_permissions ដោយស្វ័យប្រវត្តិ
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "t_auth_role_perm",
             joinColumns = @JoinColumn(name = "role_id"),
@@ -26,5 +27,6 @@ public class Role extends BaseEntity {
     )
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnoreProperties
     private Set<Permission> permissions;
 }

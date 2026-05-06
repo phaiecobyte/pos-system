@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,12 +29,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // បើកដំណើរការ CORS
+                .cors(Customizer.withDefaults()) // ប្រើ Customizer ជាស្តង់ដារថ្មី
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // អនុញ្ញាតឱ្យហៅ Login, Register និង Refresh-Token ដោយមិនបាច់មាន Token
+                        // បន្ថែម /api/v1/auth/** ដើម្បីអនុញ្ញាតរាល់ Endpoint ក្រោម Auth ទាំងអស់
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh-token").permitAll()
-                        // រាល់ Request ផ្សេងៗ (រួមទាំង /logout ផងដែរ) ត្រូវតែមាន Access Token
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -45,25 +45,16 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // កំណត់ប្រភពណាខ្លះ (Origins) ដែលមានសិទ្ធិហៅចូល API នេះ
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // អនុញ្ញាត Frontend Origin
+        // អនុញ្ញាតទាំង localhost:4200 (Angular) និង localhost លេខផ្សេងៗពេលអភិវឌ្ឍន៍
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-
-        // អនុញ្ញាត Methods ដែល Frontend អាចប្រើបាន
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // អនុញ្ញាត Headers ដែលតម្រូវឱ្យមាន (ពិសេស Authorization សម្រាប់បញ្ជូន Token)
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-
-        // អនុញ្ញាតឱ្យ Frontend អាចអាន Headers ដែល Backend បោះត្រឡប់ទៅវិញ
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowedHeaders(List.of("*")); // អនុញ្ញាត Headers ទាំងអស់ដើម្បីកុំឱ្យមានបញ្ហា CORS
+        configuration.setAllowCredentials(true); // សំខាន់បើត្រូវការប្រើ Cookies ឬ Authentication headers
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // អនុវត្តច្បាប់ CORS នេះទៅលើគ្រប់ Endpoints ទាំងអស់
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

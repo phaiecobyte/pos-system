@@ -77,4 +77,8 @@ public class JwtService {
         byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
 }

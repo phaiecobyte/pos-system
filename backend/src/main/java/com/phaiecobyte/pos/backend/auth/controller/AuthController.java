@@ -8,6 +8,7 @@ import com.phaiecobyte.pos.backend.auth.entity.User;
 import com.phaiecobyte.pos.backend.auth.service.AuthServiceImpl;
 import com.phaiecobyte.pos.backend.core.base.ApiResponse;
 import com.phaiecobyte.pos.backend.core.exception.AppException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,12 +41,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<ApiResponse<String>> logout(@AuthenticationPrincipal User currentUser, HttpServletRequest request) {
         if (currentUser == null) {
             throw new AppException(HttpStatus.UNAUTHORIZED, "Unauthorize!");
         }
 
-        authService.logout(currentUser);
+        authService.logout(currentUser,request);
 
         ApiResponse<String> response = ApiResponse.<String>builder()
                 .status(HttpStatus.OK.value())

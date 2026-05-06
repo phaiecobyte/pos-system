@@ -17,14 +17,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = "password")
 public class User extends BaseEntity implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)
-    @ToString.Exclude
     private String password; //encrypt password
 
     @Column(nullable = false)

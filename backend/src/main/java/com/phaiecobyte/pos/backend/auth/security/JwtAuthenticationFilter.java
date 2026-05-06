@@ -1,13 +1,14 @@
 package com.phaiecobyte.pos.backend.auth.security;
 
-import io.jsonwebtoken.ExpiredJwtException; // <--- បន្ថែម Import នេះ
-import io.jsonwebtoken.JwtException; // <--- បន្ថែម Import នេះ
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j // ប្រើ Lombok Slf4j ជំនួសឱ្យ System.out.println
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -32,25 +34,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException
     {
         final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String username;
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+        // ពិនិត្យឱ្យច្បាស់លាស់ ដោយមិនប្រកាន់តួអក្សរធំតូច (Case-insensitive)
+        if(authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")){
             filterChain.doFilter(request,response);
             return;
         }
 
-        jwt = authHeader.substring(7);
+        final String jwt = authHeader.substring(7);
+        final String username;
 
-        // ប្រើ Try-Catch ដើម្បីការពារ Server បោះ Error 500 ពេល Token ផុតកំណត់ ឬខូច
         try {
             username = jwtService.extractUsername(jwt);
 
-            // ទី៣៖ បើមានឈ្មោះ User ហើយគាត់មិនទាន់បាន Authenticated នៅក្នុង System ទេ
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                // ទី៤៖ ពិនិត្យមើលថា Token នៅមានសុពលភាពឬទេ
+                // នៅទីនេះ បើអ្នកអនុវត្តប្រព័ន្ធ Blacklist អ្នកត្រូវបន្ថែមលក្ខខណ្ឌឆែក Token Blacklist ផងដែរ
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -59,23 +59,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    // អនុញ្ញាតឱ្យ User ចូលប្រើប្រាស់
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         } catch (ExpiredJwtException e) {
-            // Token បានផុតកំណត់ (អ្នកអាច Log វាទុកបើសិនជាចង់)
-            System.out.println("JWT Token is expired: " + e.getMessage());
+            log.warn("JWT Token is expired: {}", e.getMessage());
         } catch (JwtException e) {
-            // Token ខូច ឬមិនត្រឹមត្រូវ
-            System.out.println("Invalid JWT Token: " + e.getMessage());
+            log.warn("Invalid JWT Token: {}", e.getMessage());
         } catch (Exception e) {
-            // កំហុសផ្សេងៗដែលអាចកើតមានកំឡុងពេលទាញយក User
-            System.out.println("Error during authentication validation: " + e.getMessage());
+            log.error("Error during authentication validation: {}", e.getMessage());
         }
 
-        // បន្តដំណើរការ Request ទៅកាន់ Filter បន្ទាប់
-        // (បើចូល Catch ខាងលើ Authentication នឹងនៅតែ null រួច Spring Security នឹង Block វាជា 401/403)
         filterChain.doFilter(request, response);
     }
 }

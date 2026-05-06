@@ -4,9 +4,10 @@ import com.phaiecobyte.pos.backend.auth.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
 import com.phaiecobyte.pos.backend.auth.dto.RegisterRequest;
 import com.phaiecobyte.pos.backend.auth.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface AuthService {
     AuthResponse authenticate(AuthRequest req);
     AuthResponse register(RegisterRequest req);
-    void logout(User user);
+    void logout(User user, HttpServletRequest request);
 }
