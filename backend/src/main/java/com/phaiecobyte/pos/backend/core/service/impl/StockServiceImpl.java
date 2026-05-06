@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.core.service.impl;
 
+import com.phaiecobyte.pos.backend.core.annotation.LogAudit;
 import com.phaiecobyte.pos.backend.core.dto.ProductRes;
 import com.phaiecobyte.pos.backend.core.dto.StockReq;
 import com.phaiecobyte.pos.backend.core.enums.TransactionType;
@@ -16,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j // បន្ថែម Logger ដើម្បីតាមដានប្រតិបត្តិការសំខាន់ៗ
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StockServiceImpl implements StockService {
@@ -27,9 +28,11 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
+    @LogAudit(action = "STOCK_UPDATE", moduleName = "STOCK", entityName = "t_core_product", defaultReason = "ធ្វើប្រតិបត្តិការកាត់/បន្ថែមស្តុក")
     public ProductRes processStock(StockReq request) {
 
-        Product product = productRepository.findById(request.getProductId())
+        // ប្រើ Pessimistic Lock ដើម្បីការពារការកាត់ស្តុកជាន់គ្នា (Race Condition)
+        Product product = productRepository.findByIdWithPessimisticLock(request.getProductId())
                 .orElseThrow(() -> {
                     log.error("ប្រតិបត្តិការស្តុកបរាជ័យ - រកមិនឃើញទំនិញ ID: {}", request.getProductId());
                     return new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញទំនិញនេះទេ!");

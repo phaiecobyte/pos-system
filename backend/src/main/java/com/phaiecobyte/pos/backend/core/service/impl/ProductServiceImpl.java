@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.core.service.impl;
 
+import com.phaiecobyte.pos.backend.core.annotation.LogAudit;
 import com.phaiecobyte.pos.backend.core.dto.ProductReq;
 import com.phaiecobyte.pos.backend.core.dto.ProductRes;
 import com.phaiecobyte.pos.backend.core.model.Category;
@@ -11,14 +12,12 @@ import com.phaiecobyte.pos.backend.core.repository.ProductRepository;
 import com.phaiecobyte.pos.backend.core.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,27 +27,24 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository; // ត្រូវប្រើដើម្បីឆែក Category
+    private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
 
     @Override
     @Transactional
+    @LogAudit(action = "CREATE", moduleName = "PRODUCT", entityName = "t_core_product", defaultReason = "បង្កើតទំនិញថ្មី")
     public ProductRes createProduct(ProductReq request) {
-        // ១. ឆែកមើលថាតើលេខកូដ (Barcode) នេះមានអ្នកប្រើហើយឬនៅ?
         if (productRepository.existsByCode(request.getCode())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "លេខកូដទំនិញនេះមានរួចហើយ!");
         }
 
-        // ២. ទាញយក Category ពី Database ផ្អែកលើ ID ដែល Frontend បោះមក
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញប្រភេទចំណាត់ថ្នាក់នេះទេ!"));
 
-        // ៣. បម្លែង DTO ទៅ Entity រួចបំពាក់ Category ចូល
         Product product = productMapper.toEntity(request);
         product.setCategory(category);
         product.setActive(true);
-        
-        // ប្រសិនបើជាទំនិញមិនកាត់ស្តុក (ឧ. កាហ្វេ) យើងកំណត់ស្តុកឱ្យស្មើ 0 ជានិច្ច
+
         if (!request.isStockable()) {
             product.setCurrentStock(0);
         }
@@ -58,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @LogAudit(action = "UPDATE", moduleName = "PRODUCT", entityName = "t_core_product", defaultReason = "កែប្រែព័ត៌មានទំនិញ")
     public ProductRes updateProduct(UUID id, ProductReq request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញទំនិញនេះទេ!"));
@@ -69,7 +66,6 @@ public class ProductServiceImpl implements ProductService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញប្រភេទចំណាត់ថ្នាក់នេះទេ!"));
 
-        // ធ្វើបច្ចុប្បន្នភាពទិន្នន័យ
         product.setCode(request.getCode());
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -102,11 +98,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @LogAudit(action = "DELETE", moduleName = "PRODUCT", entityName = "t_core_product", defaultReason = "លុបទំនិញ (Soft Delete)")
     public void deleteProduct(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញទំនិញនេះទេ!"));
-        
-        product.setActive(false); // Soft Delete
+
+        product.setActive(false);
         productRepository.save(product);
     }
 }

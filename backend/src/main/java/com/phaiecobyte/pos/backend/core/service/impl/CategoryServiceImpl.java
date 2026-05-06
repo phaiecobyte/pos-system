@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.core.service.impl;
 
+import com.phaiecobyte.pos.backend.core.annotation.LogAudit;
 import com.phaiecobyte.pos.backend.core.dto.CategoryReq;
 import com.phaiecobyte.pos.backend.core.dto.CategoryRes;
 import com.phaiecobyte.pos.backend.core.model.Category;
@@ -21,32 +22,30 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper; // <--- ប្រើ MapStruct
+    private final CategoryMapper categoryMapper;
 
     @Override
     @Transactional
+    @LogAudit(action = "CREATE", moduleName = "CATEGORY", entityName = "t_core_category", defaultReason = "បង្កើតប្រភេទចំណាត់ថ្នាក់ថ្មី")
     public CategoryRes createCategory(CategoryReq request) {
-        // ១. ពិនិត្យមើលក្រែងលោមានឈ្មោះនេះរួចហើយ
         if (categoryRepository.existsByName(request.getName())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "ឈ្មោះប្រភេទនេះមានរួចហើយ!");
         }
 
-        // ២. បម្លែង DTO ទៅជា Entity
         Category category = categoryMapper.toEntity(request);
         category.setActive(true);
 
-        // ៣. Save និង បម្លែងត្រឡប់ទៅជា Response DTO វិញ
         category = categoryRepository.save(category);
         return categoryMapper.toResponse(category);
     }
 
     @Override
     @Transactional
+    @LogAudit(action = "UPDATE", moduleName = "CATEGORY", entityName = "t_core_category", defaultReason = "កែប្រែព័ត៌មានប្រភេទចំណាត់ថ្នាក់")
     public CategoryRes updateCategory(UUID id, CategoryReq request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញប្រភេទនេះទេ!"));
 
-        // ពិនិត្យបើដូរឈ្មោះ តើឈ្មោះថ្មីនោះជាន់គេឬអត់?
         if (!category.getName().equals(request.getName()) && categoryRepository.existsByName(request.getName())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "ឈ្មោះប្រភេទនេះមានរួចហើយ!");
         }
@@ -73,11 +72,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @LogAudit(action = "DELETE", moduleName = "CATEGORY", entityName = "t_core_category", defaultReason = "លុបប្រភេទចំណាត់ថ្នាក់ (Soft Delete)")
     public void deleteCategory(UUID id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "រកមិនឃើញប្រភេទនេះទេ!"));
-        
-        // ជាទូទៅសម្រាប់ POS យើងធ្វើ Soft Delete (បិទមិនឱ្យប្រើ) ដើម្បីកុំឱ្យបាត់ប្រវត្តិលក់
+
         category.setActive(false);
         categoryRepository.save(category);
     }
