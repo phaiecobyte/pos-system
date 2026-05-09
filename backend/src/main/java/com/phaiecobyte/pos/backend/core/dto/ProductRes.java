@@ -3,6 +3,7 @@ package com.phaiecobyte.pos.backend.core.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -20,4 +21,5 @@ public class ProductRes {
     // ចំណុចសំខាន់៖ យើងបញ្ជូនទៅ Frontend តែ ID និង ឈ្មោះ Category បានហើយ
     private UUID categoryId;
     private String categoryName;
+    private LocalDateTime createdAt;
 }

@@ -71,6 +71,8 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStockable(request.isStockable());
+        product.setImageUrl(request.getImageUrl());
+
         product.setCategory(category);
 
         return productMapper.toResponse(productRepository.save(product));
@@ -90,10 +92,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductRes> getProductsByCategory(UUID categoryId) {
-        return productRepository.findByCategoryIdAndActiveTrue(categoryId).stream()
-                .map(productMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<ProductRes> getProductsByCategory(UUID categoryId,Pageable pageable) {
+        Page<Product> products = productRepository.findByCategoryIdAndActiveTrue(categoryId,pageable);
+        return products.map(productMapper::toResponse);
     }
 
     @Override

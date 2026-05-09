@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Slf4j // បន្ថែម Logger
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/core/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -55,8 +55,16 @@ public class ProductController {
     }
 
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<ApiResponse<List<ProductRes>>> getProductsByCategory(@PathVariable UUID categoryId) {
-        return ResponseEntity.ok(ApiResponse.success(productService.getProductsByCategory(categoryId), "ទាញយកទំនិញតាមប្រភេទបានជោគជ័យ"));
+    public ResponseEntity<ApiResponse<Page<ProductRes>>> getProductsByCategory(
+            @PathVariable UUID categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String[] sort) {
+
+            log.debug("ទាញយកទំនិញ ទំព័រទី: {}, ចំនួន: {}", page, size);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(sort[0]).descending());
+            Page<ProductRes> data = productService.getProductsByCategory(categoryId,pageable);
+            return ResponseEntity.ok(ApiResponse.success(data, "ទាញយកបញ្ជីទំនិញបានជោគជ័យ"));
     }
 
     @PutMapping("/{id}")
@@ -67,7 +75,7 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success(productService.updateProduct(id, request), "កែប្រែទំនិញបានជោគជ័យ"));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable UUID id) {
         log.warn("ស្នើសុំលុបទំនិញ ID: {}", id);
         productService.deleteProduct(id);

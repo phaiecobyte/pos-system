@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.auth.security;
 
+import com.phaiecobyte.pos.backend.core.exception.AppException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -21,7 +22,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j // ប្រើ Lombok Slf4j ជំនួសឱ្យ System.out.println
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;

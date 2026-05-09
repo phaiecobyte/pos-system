@@ -4,6 +4,7 @@ import com.phaiecobyte.pos.backend.auth.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,7 +34,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // បន្ថែម /api/v1/auth/** ដើម្បីអនុញ្ញាតរាល់ Endpoint ក្រោម Auth ទាំងអស់
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh-token").permitAll()
+                        .requestMatchers(
+                                // auth
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/register",
+                                "/api/v1/auth/refresh-token"
+                        ).permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/core/api/v1/categories/*",
+
+                                "/core/api/v1/products/*",
+                                "/core/api/v1/products/**"
+
+                                ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
