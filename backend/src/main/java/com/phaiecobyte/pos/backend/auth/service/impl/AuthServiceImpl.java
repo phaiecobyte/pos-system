@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.auth.service;
+package com.phaiecobyte.pos.backend.auth.service.impl;
 
 import com.phaiecobyte.pos.backend.auth.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
@@ -13,6 +13,7 @@ import com.phaiecobyte.pos.backend.auth.repository.RefreshTokenRepository;
 import com.phaiecobyte.pos.backend.auth.repository.RoleRepository;
 import com.phaiecobyte.pos.backend.auth.repository.UserRepository;
 import com.phaiecobyte.pos.backend.auth.security.JwtService;
+import com.phaiecobyte.pos.backend.auth.service.AuthService;
 import com.phaiecobyte.pos.backend.core.exception.AppException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
 
     private final InvalidatedTokenRepository invalidatedTokenRepository;
     private final UserRepository userRepository;
@@ -110,7 +110,7 @@ public class AuthServiceImpl implements AuthService{
 
         // ៤. បង្កើត Entity User ថ្មី
         User user = User.builder()
-                .fullName(request.getFullName())
+                .firstName(request.getFullName())
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))

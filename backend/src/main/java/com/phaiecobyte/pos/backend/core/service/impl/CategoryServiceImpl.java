@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.core.service.impl;
 
-import com.phaiecobyte.pos.backend.core.annotation.LogAudit;
+import com.phaiecobyte.pos.backend.core.logging.LogAudit;
 import com.phaiecobyte.pos.backend.core.dto.CategoryReq;
 import com.phaiecobyte.pos.backend.core.dto.CategoryRes;
 import com.phaiecobyte.pos.backend.core.model.Category;

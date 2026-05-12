@@ -19,16 +19,19 @@ import java.util.Set;
 @Builder
 public class User extends BaseEntity implements UserDetails {
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 55)
     private String username;
 
     @Column(name = "password", nullable = false)
     private String password; //encrypt password
 
-    @Column(nullable = false)
-    private String fullName;
+    @Column(nullable = false,length = 55)
+    private String firstName;
 
-    @Column(unique = true)
+    @Column(nullable = false,length = 55)
+    private String lastName;
+
+    @Column(unique = true,length = 55)
     private String email;
 
 

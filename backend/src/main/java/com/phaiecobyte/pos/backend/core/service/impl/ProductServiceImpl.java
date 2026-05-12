@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.core.service.impl;
 
-import com.phaiecobyte.pos.backend.core.annotation.LogAudit;
+import com.phaiecobyte.pos.backend.core.logging.LogAudit;
 import com.phaiecobyte.pos.backend.core.dto.ProductReq;
 import com.phaiecobyte.pos.backend.core.dto.ProductRes;
 import com.phaiecobyte.pos.backend.core.model.Category;
@@ -18,9 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    @LogAudit(action = "CREATE", moduleName = "PRODUCT", entityName = "t_core_product", defaultReason = "បង្កើតទំនិញថ្មី")
+    @LogAudit(action = "CREATE", moduleName = "CORE", entityName = "t_core_product", defaultReason = "បង្កើតទំនិញថ្មី")
     public ProductRes createProduct(ProductReq request) {
         if (productRepository.existsByCode(request.getCode())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "លេខកូដទំនិញនេះមានរួចហើយ!");

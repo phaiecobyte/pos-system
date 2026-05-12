@@ -5,7 +5,7 @@ import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
 import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenRequest;
 import com.phaiecobyte.pos.backend.auth.dto.RegisterRequest;
 import com.phaiecobyte.pos.backend.auth.entity.User;
-import com.phaiecobyte.pos.backend.auth.service.AuthServiceImpl;
+import com.phaiecobyte.pos.backend.auth.service.impl.AuthServiceImpl;
 import com.phaiecobyte.pos.backend.core.base.ApiResponse;
 import com.phaiecobyte.pos.backend.core.exception.AppException;
 import jakarta.servlet.http.HttpServletRequest;

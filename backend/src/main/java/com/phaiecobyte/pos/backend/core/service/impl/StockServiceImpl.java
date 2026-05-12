@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.core.service.impl;
 
-import com.phaiecobyte.pos.backend.core.annotation.LogAudit;
+import com.phaiecobyte.pos.backend.core.logging.LogAudit;
 import com.phaiecobyte.pos.backend.core.dto.ProductRes;
 import com.phaiecobyte.pos.backend.core.dto.StockReq;
 import com.phaiecobyte.pos.backend.core.enums.TransactionType;

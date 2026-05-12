@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.core.annotation;
+package com.phaiecobyte.pos.backend.core.logging;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,5 +13,5 @@ public @interface LogAudit {
     String action(); // ឧ. "CREATE", "UPDATE", "DELETE"
     String moduleName(); // ឧ. "PRODUCT_MODULE", "CATEGORY_MODULE"
     String entityName(); // ឧ. "t_core_product"
-    String defaultReason() default "ប្រតិបត្តិការប្រព័ន្ធស្វ័យប្រវត្តិ"; 
+    String defaultReason() default "";
 }

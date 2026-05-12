@@ -5,6 +5,8 @@ import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
 import com.phaiecobyte.pos.backend.auth.dto.RegisterRequest;
 import com.phaiecobyte.pos.backend.auth.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface AuthService {
     AuthResponse authenticate(AuthRequest req);
