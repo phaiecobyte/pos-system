@@ -2,8 +2,8 @@ package com.phaiecobyte.pos.backend.auth.controller;
 
 import com.phaiecobyte.pos.backend.auth.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
-import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenRequest;
-import com.phaiecobyte.pos.backend.auth.dto.RegisterRequest;
+import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenReq;
+import com.phaiecobyte.pos.backend.auth.dto.RegisterReq;
 import com.phaiecobyte.pos.backend.auth.entity.User;
 import com.phaiecobyte.pos.backend.auth.service.impl.AuthServiceImpl;
 import com.phaiecobyte.pos.backend.core.base.ApiResponse;
@@ -31,12 +31,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest req){
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterReq req){
         return ResponseEntity.ok(authService.register(req));
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenReq request) {
         return ResponseEntity.ok(authService.refreshToken(request));
     }
 

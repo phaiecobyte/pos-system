@@ -1,6 +1,8 @@
 package com.phaiecobyte.pos.backend.auth.controller;
 
+import com.phaiecobyte.pos.backend.auth.dto.AssignRoleReq;
 import com.phaiecobyte.pos.backend.auth.dto.CreateUserReq;
+import com.phaiecobyte.pos.backend.auth.dto.UserDto;
 import com.phaiecobyte.pos.backend.auth.service.UserService;
 import com.phaiecobyte.pos.backend.core.base.ApiResponse;
 import jakarta.validation.Valid;
@@ -40,4 +42,13 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(userService.toggleUserStatus(id),"Change user status successfully...!"));
     }
 
+    @PutMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> assignRoles(
+            @PathVariable(value = "id") UUID id,
+            @RequestBody AssignRoleReq req
+            ){
+        var user = userService.assignRole(id,req);
+        return ResponseEntity.ok(ApiResponse.success(user,"Assign role to user successfully...!"));
+    }
 }

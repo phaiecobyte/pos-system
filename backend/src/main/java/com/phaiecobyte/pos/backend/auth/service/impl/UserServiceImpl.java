@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.auth.service.impl;
 
+import com.phaiecobyte.pos.backend.auth.dto.AssignRoleReq;
 import com.phaiecobyte.pos.backend.auth.dto.CreateUserReq;
 import com.phaiecobyte.pos.backend.auth.dto.UserDto;
 import com.phaiecobyte.pos.backend.auth.entity.Role;
@@ -64,5 +65,19 @@ public class UserServiceImpl implements UserService {
         user.setActive(!user.isActive());
 
         return userMapper.toDto(user);
+    }
+
+    @Override
+    public UserDto assignRole(UUID id, AssignRoleReq req) {
+        User user = userRepository.findById(id)
+                .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND,"User not found"));
+        Set<Role> roles = new HashSet<>(roleRepository.findAllById(req.getRoleIds()));
+
+        if(roles.isEmpty()){
+            throw new RuntimeException("Invalid roles or not exist in system");
+        }
+
+        user.setRoles(roles);
+        return userMapper.toDto(userRepository.save(user));
     }
 }

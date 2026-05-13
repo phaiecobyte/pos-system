@@ -2,8 +2,8 @@ package com.phaiecobyte.pos.backend.auth.service.impl;
 
 import com.phaiecobyte.pos.backend.auth.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
-import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenRequest;
-import com.phaiecobyte.pos.backend.auth.dto.RegisterRequest;
+import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenReq;
+import com.phaiecobyte.pos.backend.auth.dto.RegisterReq;
 import com.phaiecobyte.pos.backend.auth.entity.InvalidatedToken;
 import com.phaiecobyte.pos.backend.auth.entity.RefreshToken;
 import com.phaiecobyte.pos.backend.auth.entity.Role;
@@ -90,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterReq request) {
         // ១. ពិនិត្យមើលថាតើ Username នេះមានអ្នកប្រើហើយឬនៅ?
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Username is existed!");
@@ -153,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     // បន្ថែមចូលក្នុង AuthServiceImpl.java
-    public AuthResponse refreshToken(RefreshTokenRequest request) {
+    public AuthResponse refreshToken(RefreshTokenReq request) {
         return refreshTokenRepository.findByToken(request.getRefreshToken())
                 .map(this::verifyExpiration)
                 .map(RefreshToken::getUser)
