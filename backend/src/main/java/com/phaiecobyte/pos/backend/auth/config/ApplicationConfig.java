@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.auth.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phaiecobyte.pos.backend.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,11 @@ public class ApplicationConfig{
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
 }

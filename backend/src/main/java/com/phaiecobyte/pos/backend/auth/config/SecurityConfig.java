@@ -1,6 +1,7 @@
 package com.phaiecobyte.pos.backend.auth.config;
 
 import com.phaiecobyte.pos.backend.auth.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +33,15 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults()) // ប្រើ Customizer ជាស្តង់ដារថ្មី
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // កំណត់ឱ្យត្រឡប់ 401 ពេលគ្មាន Token សោះ (Missing Token)
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{ \"timestamp\": \"" + java.time.LocalDateTime.now() + "\", \"status\": 401, \"message\": \"Unauthorized! Token is missing or required.\" }");
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
                         // បន្ថែម /api/v1/auth/** ដើម្បីអនុញ្ញាតរាល់ Endpoint ក្រោម Auth ទាំងអស់
                         .requestMatchers(

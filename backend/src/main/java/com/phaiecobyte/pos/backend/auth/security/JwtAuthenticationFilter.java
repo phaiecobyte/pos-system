@@ -1,6 +1,7 @@
 package com.phaiecobyte.pos.backend.auth.security;
 
-import com.phaiecobyte.pos.backend.core.exception.AppException;
+import com.fasterxml.jackson.databind.ObjectMapper; // <-- បន្ថែម Import នេះ
+import com.phaiecobyte.pos.backend.core.base.ApiResponse; // <-- បន្ថែម Import នេះ
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -10,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus; // <-- បន្ថែម Import នេះ
+import org.springframework.http.MediaType; // <-- បន្ថែម Import នេះ
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime; // <-- បន្ថែម Import នេះ
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper; // <-- Spring Boot នឹង Inject ឱ្យដោយស្វ័យប្រវត្តិ
 
     @Override
     protected void doFilterInternal(
@@ -51,7 +56,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                // នៅទីនេះ បើអ្នកអនុវត្តប្រព័ន្ធ Blacklist អ្នកត្រូវបន្ថែមលក្ខខណ្ឌឆែក Token Blacklist ផងដែរ
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -65,12 +69,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             log.warn("JWT Token is expired: {}", e.getMessage());
+            handleAuthError(response, HttpStatus.UNAUTHORIZED, "JWT Token is expired! Please login again.");
+            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
         } catch (JwtException e) {
             log.warn("Invalid JWT Token: {}", e.getMessage());
+            handleAuthError(response, HttpStatus.UNAUTHORIZED, "Invalid JWT Token!");
+            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
         } catch (Exception e) {
             log.error("Error during authentication validation: {}", e.getMessage());
+            handleAuthError(response, HttpStatus.INTERNAL_SERVER_ERROR, "Authentication validation error.");
+            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    // បង្កើត Method ថ្មីសម្រាប់សរសេរ Response ចេញជា JSON ទម្រង់ ApiResponse របស់អ្នក
+    private void handleAuthError(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .message(message)
+                .build();
+
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 }
