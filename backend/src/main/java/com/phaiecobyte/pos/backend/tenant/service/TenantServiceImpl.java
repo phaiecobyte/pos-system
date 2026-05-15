@@ -27,6 +27,13 @@ public class TenantServiceImpl implements TenantService{
     }
 
     @Override
+    public TenantDto.Response getById(UUID id){
+        Tenant tenant = tenantRepository.findById(id)
+                .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND,"Not found"));
+        return tenantMapper.toDto(tenant);
+    }
+
+    @Override
     public TenantDto.Response create(TenantDto.CreateReq req) {
         Tenant tenant = tenantMapper.toEntity(req);
         // ត្រួតពិនិត្យក្រែងលោមានឈ្មោះ Identifier នេះរួចហើយ
@@ -43,7 +50,12 @@ public class TenantServiceImpl implements TenantService{
 
     @Override
     public TenantDto.Response update(UUID id, TenantDto.UpdateReq req) {
-        return null;
+        Tenant existTenant = tenantRepository.findById(id)
+                .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND,"Tenant not found!"));
+
+        tenantMapper.updateEntity(existTenant,req);
+
+        return tenantMapper.toDto(tenantRepository.save(existTenant));
     }
 
     @Override

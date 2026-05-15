@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @PreAuthorize("hasAnyAuthority('CREATE_PRODUCT')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<ProductRes>> createProduct(@Valid @RequestBody ProductReq request) {
         log.info("ទទួលបានសំណើរបង្កើតទំនិញថ្មី: {}", request.getName());
@@ -67,7 +69,8 @@ public class ProductController {
             return ResponseEntity.ok(ApiResponse.success(data, "ទាញយកបញ្ជីទំនិញបានជោគជ័យ"));
     }
 
-    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('UPDATE_PRODUCT')")
+    @PutMapping("update/{id}")
     public ResponseEntity<ApiResponse<ProductRes>> updateProduct(
             @PathVariable UUID id,
             @Valid @RequestBody ProductReq request) {
@@ -75,6 +78,7 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success(productService.updateProduct(id, request), "កែប្រែទំនិញបានជោគជ័យ"));
     }
 
+    @PreAuthorize("hasAuthority('DELETE_PRODUCT')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable UUID id) {
         log.warn("ស្នើសុំលុបទំនិញ ID: {}", id);

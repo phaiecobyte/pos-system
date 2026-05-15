@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.UUID;
 
-// Class មេសម្រាប់ក្តោប DTOs ទាំងអស់របស់ Tenant
 public class TenantDto {
 
     // 1. DTO សម្រាប់ Request បង្កើតថ្មី
@@ -22,7 +21,9 @@ public class TenantDto {
     // 2. DTO សម្រាប់ Request កែប្រែ (Update)
     public record UpdateReq(
             String businessName,
-            String contactPhone
+            String contactPhone,
+            Boolean isActive,
+            LocalDate subscriptionEndDate
     ) {}
 
     // 3. DTO សម្រាប់ Response បញ្ចេញទៅ Client
