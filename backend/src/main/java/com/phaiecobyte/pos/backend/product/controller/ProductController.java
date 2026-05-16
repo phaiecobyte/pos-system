@@ -1,0 +1,87 @@
+package com.phaiecobyte.pos.backend.product.controller;
+
+import com.phaiecobyte.pos.backend.core.base.ApiResponse;
+import com.phaiecobyte.pos.backend.product.dto.ProductReq;
+import com.phaiecobyte.pos.backend.product.dto.ProductRes;
+import com.phaiecobyte.pos.backend.product.service.ProductService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@Slf4j // បន្ថែម Logger
+@RestController
+@RequestMapping("/core/api/v1/products")
+@RequiredArgsConstructor
+public class ProductController {
+
+    private final ProductService productService;
+
+    @PreAuthorize("hasAnyAuthority('CREATE_PRODUCT')")
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<ProductRes>> createProduct(@Valid @RequestBody ProductReq request) {
+        log.info("ទទួលបានសំណើរបង្កើតទំនិញថ្មី: {}", request.getName());
+        ProductRes data = productService.createProduct(request);
+        // ប្រើប្រាស់ Factory Method ថ្មីរបស់យើង
+        return new ResponseEntity<>(
+                ApiResponse.success(data, "បង្កើតទំនិញថ្មីបានជោគជ័យ"),
+                HttpStatus.CREATED
+        );
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<Page<ProductRes>>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,desc") String[] sort) {
+
+        log.debug("ទាញយកទំនិញ ទំព័រទី: {}, ចំនួន: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort[0]).descending());
+        Page<ProductRes> data = productService.getAllProducts(pageable);
+        return ResponseEntity.ok(ApiResponse.success(data, "ទាញយកបញ្ជីទំនិញបានជោគជ័យ"));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductRes>> getProductById(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.success(productService.getProductById(id), "ទាញយកទំនិញបានជោគជ័យ"));
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ApiResponse<Page<ProductRes>>> getProductsByCategory(
+            @PathVariable UUID categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String[] sort) {
+
+            log.debug("ទាញយកទំនិញ ទំព័រទី: {}, ចំនួន: {}", page, size);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(sort[0]).descending());
+            Page<ProductRes> data = productService.getProductsByCategory(categoryId,pageable);
+            return ResponseEntity.ok(ApiResponse.success(data, "ទាញយកបញ្ជីទំនិញបានជោគជ័យ"));
+    }
+
+    @PreAuthorize("hasAuthority('UPDATE_PRODUCT')")
+    @PutMapping("update/{id}")
+    public ResponseEntity<ApiResponse<ProductRes>> updateProduct(
+            @PathVariable UUID id,
+            @Valid @RequestBody ProductReq request) {
+        log.info("ធ្វើបច្ចុប្បន្នភាពទំនិញ ID: {}", id);
+        return ResponseEntity.ok(ApiResponse.success(productService.updateProduct(id, request), "កែប្រែទំនិញបានជោគជ័យ"));
+    }
+
+    @PreAuthorize("hasAuthority('DELETE_PRODUCT')")
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable UUID id) {
+        log.warn("ស្នើសុំលុបទំនិញ ID: {}", id);
+        productService.deleteProduct(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "លុបទំនិញបានជោគជ័យ"));
+    }
+}

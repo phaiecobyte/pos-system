@@ -2,7 +2,7 @@ package com.phaiecobyte.pos.backend.core.logging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.phaiecobyte.pos.backend.core.service.AuditLogService;
+import com.phaiecobyte.pos.backend.core.logging.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
