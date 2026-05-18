@@ -34,6 +34,13 @@
     </properties>
 	<dependencies>
 
+        <!--    swagger-ui    -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.13</version>
+        </dependency>
+
         <!--	Spring Data	Jpa -->
         <dependency>
 			<groupId>org.springframework.boot</groupId>
