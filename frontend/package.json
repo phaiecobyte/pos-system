@@ -10,7 +10,7 @@
     "generate:api": "openapi-generator-cli generate -i http://localhost:8080/v3/api-docs -g typescript-angular -o src/app/core/api-client --additional-properties=providedIn=root"
   },
   "private": true,
-  "packageManager": "npm@24.11.1",
+  "packageManager": "npm@24.16.0",
   "dependencies": {
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
