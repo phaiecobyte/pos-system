@@ -1,21 +1,25 @@
 import { Routes } from '@angular/router';
-// Import LoginComponent ដែលយើងទើបតែបង្កើត
-import { LoginComponent } from './features/auth/login';
-import { DashboardComponent } from './features/dashboard/dashboard';
+import { AdminLayoutComponent } from './layouts/admin-layout';
+
 
 export const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
-  },
-  {
-    path: 'login',
-    component: LoginComponent
-  },
-  {
-    path:'dashboard',
-    component: DashboardComponent
-  }
-  // TODO: ថ្ងៃក្រោយយើងនឹងបន្ថែម Route សម្រាប់ Dashboard ទីនេះ ដោយមាន AuthGuard ការពារ
+    {
+        path: '',
+        component: AdminLayoutComponent,
+        children: [
+            {
+                path: 'dashboard',
+                loadComponent: () => import('./features/dashboard/dashboard').then(c=>c.DashboardComponent)
+            },
+            {
+                path: 'tenants',
+                loadChildren: () => import('./features/tenants/tenant.route').then(m => m.TENANT_ROUTES)
+            },
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
+            }
+        ]
+    }
 ];
