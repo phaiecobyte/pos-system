@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Tenant } from '../../core/models/model';
 import { TenantApiService } from '../../core/api/tenant-api';
 import { Router } from '@angular/router';
@@ -8,46 +8,26 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [],
   template: `
-      <button
-      (click)="goToCreate()"
-      class="px-4 py-2 rounded-lg bg-blue-600 text-white">
-
+    <button (click)="goToCreate()" class="px-4 py-2 rounded-lg bg-blue-600 text-white">
       Add Tenant
-        
     </button>
     <div class="rounded-xl border bg-white">
       <table class="w-full">
-
         <thead>
-
           <tr class="border-b">
+            <th class="p-3 text-left">Code</th>
 
-            <th class="p-3 text-left">
-              Code
-            </th>
+            <th class="p-3 text-left">Business</th>
 
-            <th class="p-3 text-left">
-              Business
-            </th>
+            <th class="p-3 text-left">Type</th>
 
-            <th class="p-3 text-left">
-              Type
-            </th>
-
-            <th class="p-3 text-left">
-              Status
-            </th>
-
+            <th class="p-3 text-left">Status</th>
           </tr>
-
         </thead>
 
         <tbody>
-
-          @for(tenant of tenants(); track tenant.id) {
-
+          @for (tenant of tenants(); track tenant.id) {
             <tr class="border-b">
-
               <td class="p-3">
                 {{ tenant.code }}
               </td>
@@ -61,59 +41,31 @@ import { Router } from '@angular/router';
               </td>
 
               <td class="p-3">
-
-                <span
-                  class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
-
+                <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
                   {{ tenant.status }}
-
                 </span>
-
               </td>
-
             </tr>
-
           }
-
         </tbody>
-
       </table>
       <div class="flex justify-between mt-4">
-      <button
-        (click)="previousPage()"
-        [disabled]="page() === 0">
+        <button (click)="previousPage()" [disabled]="page() === 0">Previous</button>
 
-        Previous
+        <span>
+          Page {{ page() + 1 }}
+          of
+          {{ totalPages() }}
+        </span>
 
-      </button>
-
-      <span>
-
-        Page {{ page() + 1 }}
-        of
-        {{ totalPages() }}
-
-      </span>
-
-      <button
-        (click)="nextPage()"
-        [disabled]="page() + 1 >= totalPages()">
-
-        Next
-
-      </button>
-
-    </div>
-
+        <button (click)="nextPage()" [disabled]="page() + 1 >= totalPages()">Next</button>
+      </div>
     </div>
   `,
-  styles: [
-    `
-    `,
-  ],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styles: [``],
 })
 export class TenantListComponent implements OnInit {
-
   readonly tenants = signal<Tenant[]>([]);
   readonly loading = signal(false);
   readonly page = signal(0);
@@ -123,64 +75,46 @@ export class TenantListComponent implements OnInit {
 
   private readonly router = inject(Router);
 
-  tenantApiService = inject(TenantApiService)
+  tenantApiService = inject(TenantApiService);
 
   ngOnInit() {
     this.loadTenants();
   }
 
   loadTenants() {
-
     this.loading.set(true);
 
-    this.tenantApiService
-      .list(
-        this.page(),
-        this.size()
-      )
-      .subscribe({
+    this.tenantApiService.list(this.page(), this.size()).subscribe({
+      next: (response) => {
+        this.tenants.set(response.data.content);
 
-        next: response => {
+        this.totalElements.set(response.data.totalElements);
 
-          this.tenants.set(
-            response.data.content
-          );
+        this.totalPages.set(response.data.totalPages);
 
-          this.totalElements.set(
-            response.data.totalElements
-          );
+        this.loading.set(false);
+      },
 
-          this.totalPages.set(
-            response.data.totalPages
-          );
-
-          this.loading.set(false);
-
-        },
-
-        error: () => {
-          this.loading.set(false);
-        }
-
-      });
+      error: () => {
+        this.loading.set(false);
+      },
+    });
   }
   nextPage() {
-
     if (this.page() + 1 >= this.totalPages()) {
       return;
     }
 
-    this.page.update(v => v + 1);
+    this.page.update((v) => v + 1);
 
     this.loadTenants();
   }
   previousPage() {
-
     if (this.page() === 0) {
       return;
     }
 
-    this.page.update(v => v - 1);
+    this.page.update((v) => v - 1);
 
     this.loadTenants();
   }
@@ -188,8 +122,4 @@ export class TenantListComponent implements OnInit {
   goToCreate() {
     this.router.navigate(['/tenants/create']);
   }
-
-
-
-
 }
