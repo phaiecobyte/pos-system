@@ -1,16 +1,15 @@
-package com.phaiecobyte.pos.backend.product.service.impl;
+package com.phaiecobyte.pos.backend.catalog.service.impl;
 
-import com.phaiecobyte.pos.backend.core.logging.LogAudit;
-import com.phaiecobyte.pos.backend.product.dto.ProductDto;
-import com.phaiecobyte.pos.backend.core.exception.AppException;
-import com.phaiecobyte.pos.backend.product.mapper.ProductMapper;
-import com.phaiecobyte.pos.backend.product.model.Category;
-import com.phaiecobyte.pos.backend.product.model.Product;
-import com.phaiecobyte.pos.backend.product.repository.CategoryRepository;
-import com.phaiecobyte.pos.backend.product.repository.ProductRepository;
-import com.phaiecobyte.pos.backend.product.service.ProductService;
+import com.phaiecobyte.pos.backend.common.logging.LogAudit;
+import com.phaiecobyte.pos.backend.catalog.dto.ProductDto;
+import com.phaiecobyte.pos.backend.common.exception.AppException;
+import com.phaiecobyte.pos.backend.catalog.mapper.ProductMapper;
+import com.phaiecobyte.pos.backend.catalog.model.Category;
+import com.phaiecobyte.pos.backend.catalog.model.Product;
+import com.phaiecobyte.pos.backend.catalog.repository.CategoryRepository;
+import com.phaiecobyte.pos.backend.catalog.repository.ProductRepository;
+import com.phaiecobyte.pos.backend.catalog.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

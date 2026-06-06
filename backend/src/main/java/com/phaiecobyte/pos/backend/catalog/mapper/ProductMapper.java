@@ -1,7 +1,7 @@
-package com.phaiecobyte.pos.backend.product.mapper;
+package com.phaiecobyte.pos.backend.catalog.mapper;
 
-import com.phaiecobyte.pos.backend.product.dto.ProductDto;
-import com.phaiecobyte.pos.backend.product.model.Product;
+import com.phaiecobyte.pos.backend.catalog.dto.ProductDto;
+import com.phaiecobyte.pos.backend.catalog.model.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

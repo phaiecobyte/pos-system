@@ -1,9 +1,9 @@
-package com.phaiecobyte.pos.backend.product.controller;
+package com.phaiecobyte.pos.backend.catalog.controller;
 
-import com.phaiecobyte.pos.backend.core.base.ApiResponse;
-import com.phaiecobyte.pos.backend.product.dto.ProductDto;
-import com.phaiecobyte.pos.backend.product.dto.StockDto;
-import com.phaiecobyte.pos.backend.product.service.StockService;
+import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.catalog.dto.ProductDto;
+import com.phaiecobyte.pos.backend.catalog.dto.StockDto;
+import com.phaiecobyte.pos.backend.catalog.service.StockService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

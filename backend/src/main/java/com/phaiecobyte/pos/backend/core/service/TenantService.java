@@ -1,6 +1,6 @@
-package com.phaiecobyte.pos.backend.tenant.service;
+package com.phaiecobyte.pos.backend.core.service;
 
-import com.phaiecobyte.pos.backend.tenant.dto.TenantDto;
+import com.phaiecobyte.pos.backend.core.dto.TenantDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

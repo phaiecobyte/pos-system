@@ -2,11 +2,11 @@ package com.phaiecobyte.pos.backend.auth.controller;
 
 import com.phaiecobyte.pos.backend.auth.dto.AssignRoleReq;
 import com.phaiecobyte.pos.backend.auth.dto.CreateUserReq;
-import com.phaiecobyte.pos.backend.auth.dto.UserDto;
 import com.phaiecobyte.pos.backend.auth.service.UserService;
-import com.phaiecobyte.pos.backend.core.base.ApiResponse;
+import com.phaiecobyte.pos.backend.common.base.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class UserController {
 
     @GetMapping("/list")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> list(Pageable pageable){
+    public ResponseEntity<?> list(@ParameterObject Pageable pageable){
         var users = userService.list(pageable);
         return ResponseEntity.ok(ApiResponse.success(users,"Retrieve user successfully...!"));
     }

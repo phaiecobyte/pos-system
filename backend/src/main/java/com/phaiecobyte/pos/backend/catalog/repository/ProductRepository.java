@@ -1,6 +1,6 @@
-package com.phaiecobyte.pos.backend.product.repository;
+package com.phaiecobyte.pos.backend.catalog.repository;
 
-import com.phaiecobyte.pos.backend.product.model.Product;
+import com.phaiecobyte.pos.backend.catalog.model.Product;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;
 import org.springframework.data.domain.Page;

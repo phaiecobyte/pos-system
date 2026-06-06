@@ -1,10 +1,11 @@
-package com.phaiecobyte.pos.backend.tenant.service;
+package com.phaiecobyte.pos.backend.core.service;
 
-import com.phaiecobyte.pos.backend.core.exception.AppException;
-import com.phaiecobyte.pos.backend.tenant.dto.TenantDto;
-import com.phaiecobyte.pos.backend.tenant.entity.Tenant;
-import com.phaiecobyte.pos.backend.tenant.mapper.TenantMapper;
-import com.phaiecobyte.pos.backend.tenant.repository.TenantRepository;
+import com.phaiecobyte.pos.backend.common.exception.AppException;
+import com.phaiecobyte.pos.backend.core.dto.TenantDto;
+import com.phaiecobyte.pos.backend.core.model.Tenant;
+import com.phaiecobyte.pos.backend.core.mapper.TenantMapper;
+import com.phaiecobyte.pos.backend.core.repository.BusinessTypeRepository;
+import com.phaiecobyte.pos.backend.core.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class TenantServiceImpl implements TenantService{
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
+    private final BusinessTypeRepository businessTypeRepository;
 
     @Override
     public Page<TenantDto.Response> list(Pageable pageable) {
@@ -36,11 +38,15 @@ public class TenantServiceImpl implements TenantService{
     @Override
     public TenantDto.Response create(TenantDto.CreateReq req) {
         Tenant tenant = tenantMapper.toEntity(req);
-        // ត្រួតពិនិត្យក្រែងលោមានឈ្មោះ Identifier នេះរួចហើយ
-        if (tenantRepository.existsByTenantIdentifier(req.tenantIdentifier())) {
+
+        var businessType = businessTypeRepository.findByCode(req.businessTypeCode());
+        if(businessType == null ){
+            throw new AppException(HttpStatus.BAD_REQUEST, "Business type code is not found!");
+        }
+        tenant.setBusinessType(businessType);
+        if (tenantRepository.existsByCode(req.code())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Tenant Identifier is already taken!");
         }
-
         // កំណត់ថ្ងៃផុតកំណត់លំនាំដើម (ឧទាហរណ៍៖ ឱ្យសាកល្បងប្រើ ១ ខែ)
         if (req.subscriptionEndDate() == null) {
            tenant.setSubscriptionEndDate(LocalDate.now().plusMonths(1));

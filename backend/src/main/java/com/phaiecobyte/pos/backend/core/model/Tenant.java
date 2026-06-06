@@ -1,10 +1,7 @@
-package com.phaiecobyte.pos.backend.core.entity;
+package com.phaiecobyte.pos.backend.core.model;
 
-import com.phaiecobyte.pos.backend.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,7 +34,7 @@ public class Tenant {
     private String address;
 
     @Column(name = "status", length = 10)
-    private String status;
+    private String status = Status.A.toString();
 
     @ManyToOne
     @JoinColumn(name = "business_type_code")

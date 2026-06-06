@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.core.base;
+package com.phaiecobyte.pos.backend.common.base;
 
 import jakarta.persistence.*;
 import lombok.Getter;

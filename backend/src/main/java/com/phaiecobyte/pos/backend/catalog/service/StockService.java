@@ -1,7 +1,7 @@
-package com.phaiecobyte.pos.backend.product.service;
+package com.phaiecobyte.pos.backend.catalog.service;
 
-import com.phaiecobyte.pos.backend.product.dto.ProductDto;
-import com.phaiecobyte.pos.backend.product.dto.StockDto;
+import com.phaiecobyte.pos.backend.catalog.dto.ProductDto;
+import com.phaiecobyte.pos.backend.catalog.dto.StockDto;
 
 public interface StockService {
     ProductDto.Res processStock(StockDto.Req request);

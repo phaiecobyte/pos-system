@@ -1,7 +1,7 @@
-package com.phaiecobyte.pos.backend.product.model;
+package com.phaiecobyte.pos.backend.catalog.model;
 
-import com.phaiecobyte.pos.backend.core.base.BaseEntity;
-import com.phaiecobyte.pos.backend.product.enums.TransactionType;
+import com.phaiecobyte.pos.backend.common.base.BaseEntity;
+import com.phaiecobyte.pos.backend.catalog.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

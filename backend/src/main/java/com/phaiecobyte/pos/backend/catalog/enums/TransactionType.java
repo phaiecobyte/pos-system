@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.product.enums;
+package com.phaiecobyte.pos.backend.catalog.enums;
 
 public enum TransactionType {
     IN,         // បញ្ចូលស្តុក (ទិញចូល)

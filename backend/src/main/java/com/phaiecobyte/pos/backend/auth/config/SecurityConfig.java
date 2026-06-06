@@ -57,11 +57,15 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET,
                                 "/core/api/v1/categories/*",
-
+                                "/core/api/v1/businessType/*",
                                 "/core/api/v1/products/*",
                                 "/core/api/v1/products/**"
 
                                 ).permitAll()
+                        //for testing
+                        .requestMatchers(
+                                "/core/api/v1/tenants/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

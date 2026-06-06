@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.core.exception;
+package com.phaiecobyte.pos.backend.common.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,8 +1,8 @@
-package com.phaiecobyte.pos.backend.product.controller;
+package com.phaiecobyte.pos.backend.catalog.controller;
 
-import com.phaiecobyte.pos.backend.core.base.ApiResponse;
-import com.phaiecobyte.pos.backend.product.dto.ProductDto;
-import com.phaiecobyte.pos.backend.product.service.ProductService;
+import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.catalog.dto.ProductDto;
+import com.phaiecobyte.pos.backend.catalog.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,7 +28,7 @@ public class ProductController {
 
     @PreAuthorize("hasAnyAuthority('CREATE_PRODUCT')")
     @PostMapping("/create")
-    @Operation(summary = "បង្កើតទំនិញថ្មី", operationId = "createProduct") // កំណត់ operationId
+    @Operation(summary = "បង្កើតទំនិញថ្មី", operationId = "createProduct")
     public ResponseEntity<ApiResponse<ProductDto.Res>> createProduct(@Valid @RequestBody ProductDto.Req request) {
         log.info("ទទួលបានសំណើរបង្កើតទំនិញថ្មី: {}", request.name());
         ProductDto.Res response = productService.createProduct(request);

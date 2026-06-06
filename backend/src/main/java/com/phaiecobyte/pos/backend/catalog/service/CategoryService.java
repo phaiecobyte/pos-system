@@ -1,6 +1,6 @@
-package com.phaiecobyte.pos.backend.product.service;
+package com.phaiecobyte.pos.backend.catalog.service;
 
-import com.phaiecobyte.pos.backend.product.dto.CategoryDto;
+import com.phaiecobyte.pos.backend.catalog.dto.CategoryDto;
 
 import java.util.List;
 import java.util.UUID;

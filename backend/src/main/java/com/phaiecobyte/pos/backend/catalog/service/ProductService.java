@@ -1,6 +1,6 @@
-package com.phaiecobyte.pos.backend.product.service;
+package com.phaiecobyte.pos.backend.catalog.service;
 
-import com.phaiecobyte.pos.backend.product.dto.ProductDto;
+import com.phaiecobyte.pos.backend.catalog.dto.ProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

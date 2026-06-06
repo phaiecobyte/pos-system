@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.auth.entity;
 
-import com.phaiecobyte.pos.backend.core.base.BaseEntity;
+import com.phaiecobyte.pos.backend.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

@@ -1,7 +1,7 @@
 package com.phaiecobyte.pos.backend.auth.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.phaiecobyte.pos.backend.core.base.BaseEntity;
+import com.phaiecobyte.pos.backend.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

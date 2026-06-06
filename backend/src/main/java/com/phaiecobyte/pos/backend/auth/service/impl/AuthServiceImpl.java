@@ -14,7 +14,7 @@ import com.phaiecobyte.pos.backend.auth.repository.RoleRepository;
 import com.phaiecobyte.pos.backend.auth.repository.UserRepository;
 import com.phaiecobyte.pos.backend.auth.security.JwtService;
 import com.phaiecobyte.pos.backend.auth.service.AuthService;
-import com.phaiecobyte.pos.backend.core.exception.AppException;
+import com.phaiecobyte.pos.backend.common.exception.AppException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +40,6 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
 
     @Value("${app.jwt-refresh-expiration-ms}")
@@ -152,7 +150,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    // បន្ថែមចូលក្នុង AuthServiceImpl.java
+    @Override
     public AuthResponse refreshToken(RefreshTokenReq request) {
         return refreshTokenRepository.findByToken(request.getRefreshToken())
                 .map(this::verifyExpiration)

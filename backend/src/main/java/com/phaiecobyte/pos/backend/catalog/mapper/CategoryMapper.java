@@ -1,7 +1,7 @@
-package com.phaiecobyte.pos.backend.product.mapper;
+package com.phaiecobyte.pos.backend.catalog.mapper;
 
-import com.phaiecobyte.pos.backend.product.dto.CategoryDto;
-import com.phaiecobyte.pos.backend.product.model.Category;
+import com.phaiecobyte.pos.backend.catalog.dto.CategoryDto;
+import com.phaiecobyte.pos.backend.catalog.model.Category;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring") // ប្រាប់ MapStruct ឱ្យបង្កើតជា Spring Bean (@Component)

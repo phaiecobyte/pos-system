@@ -1,10 +1,11 @@
-package com.phaiecobyte.pos.backend.tenant.controller;
+package com.phaiecobyte.pos.backend.core.controller;
 
-import com.phaiecobyte.pos.backend.core.base.ApiResponse;
-import com.phaiecobyte.pos.backend.tenant.dto.TenantDto;
-import com.phaiecobyte.pos.backend.tenant.service.TenantService;
+import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.dto.TenantDto;
+import com.phaiecobyte.pos.backend.core.service.TenantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +15,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("sys/api/v1/tenants")
+@RequestMapping("core/api/v1/tenants")
 @RequiredArgsConstructor
 public class TenantController {
 
     private final TenantService tenantService;
 
     // មានតែអ្នកមានសិទ្ធិ SUPER_ADMIN ប៉ុណ្ណោះទើបអាចមើលបញ្ជីហាងទាំងអស់បាន
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+//    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/list")
     public ResponseEntity<Object> listTenants(
-            Pageable pageable
+            @ParameterObject Pageable pageable
     ) {
         var tenants = tenantService.list(pageable);
         return ResponseEntity.ok(ApiResponse.success(tenants, "Tenants retrieved successfully!"));

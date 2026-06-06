@@ -1,8 +1,8 @@
-package com.phaiecobyte.pos.backend.product.controller;
+package com.phaiecobyte.pos.backend.catalog.controller;
 
-import com.phaiecobyte.pos.backend.core.base.ApiResponse;
-import com.phaiecobyte.pos.backend.product.dto.CategoryDto;
-import com.phaiecobyte.pos.backend.product.service.CategoryService;
+import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.catalog.dto.CategoryDto;
+import com.phaiecobyte.pos.backend.catalog.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

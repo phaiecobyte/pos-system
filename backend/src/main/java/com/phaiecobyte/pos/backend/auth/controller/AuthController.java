@@ -5,9 +5,10 @@ import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
 import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenReq;
 import com.phaiecobyte.pos.backend.auth.dto.RegisterReq;
 import com.phaiecobyte.pos.backend.auth.entity.User;
+import com.phaiecobyte.pos.backend.auth.service.AuthService;
 import com.phaiecobyte.pos.backend.auth.service.impl.AuthServiceImpl;
-import com.phaiecobyte.pos.backend.core.base.ApiResponse;
-import com.phaiecobyte.pos.backend.core.exception.AppException;
+import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.common.exception.AppException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthServiceImpl authService;
+    private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
@@ -49,7 +50,6 @@ public class AuthController {
         authService.logout(currentUser,request);
 
         ApiResponse<String> response = ApiResponse.<String>builder()
-                .status(HttpStatus.OK.value())
                 .message("Logout successfully!")
                 .build();
 

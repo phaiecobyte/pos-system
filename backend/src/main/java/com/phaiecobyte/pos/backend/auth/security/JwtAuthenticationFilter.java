@@ -1,7 +1,7 @@
 package com.phaiecobyte.pos.backend.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper; // <-- បន្ថែម Import នេះ
-import com.phaiecobyte.pos.backend.core.base.ApiResponse; // <-- បន្ថែម Import នេះ
+import com.phaiecobyte.pos.backend.common.base.ApiResponse; // <-- បន្ថែម Import នេះ
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -90,8 +90,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         ApiResponse<Object> apiResponse = ApiResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(status.value())
                 .message(message)
                 .build();
 

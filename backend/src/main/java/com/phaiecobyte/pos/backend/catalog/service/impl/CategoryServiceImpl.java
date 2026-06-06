@@ -1,12 +1,12 @@
-package com.phaiecobyte.pos.backend.product.service.impl;
+package com.phaiecobyte.pos.backend.catalog.service.impl;
 
-import com.phaiecobyte.pos.backend.core.logging.LogAudit;
-import com.phaiecobyte.pos.backend.product.dto.CategoryDto;
-import com.phaiecobyte.pos.backend.core.exception.AppException;
-import com.phaiecobyte.pos.backend.product.mapper.CategoryMapper;
-import com.phaiecobyte.pos.backend.product.model.Category;
-import com.phaiecobyte.pos.backend.product.repository.CategoryRepository;
-import com.phaiecobyte.pos.backend.product.service.CategoryService;
+import com.phaiecobyte.pos.backend.common.logging.LogAudit;
+import com.phaiecobyte.pos.backend.catalog.dto.CategoryDto;
+import com.phaiecobyte.pos.backend.common.exception.AppException;
+import com.phaiecobyte.pos.backend.catalog.mapper.CategoryMapper;
+import com.phaiecobyte.pos.backend.catalog.model.Category;
+import com.phaiecobyte.pos.backend.catalog.repository.CategoryRepository;
+import com.phaiecobyte.pos.backend.catalog.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

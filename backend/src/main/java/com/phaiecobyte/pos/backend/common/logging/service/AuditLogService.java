@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.core.logging.service;
+package com.phaiecobyte.pos.backend.common.logging.service;
 
 import java.util.UUID;
 

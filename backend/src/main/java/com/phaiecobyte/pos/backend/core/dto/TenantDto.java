@@ -1,24 +1,28 @@
-package com.phaiecobyte.pos.backend.tenant.dto;
+package com.phaiecobyte.pos.backend.core.dto;
 
+import com.phaiecobyte.pos.backend.core.model.BusinessType;
+import com.phaiecobyte.pos.backend.core.model.Status;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class TenantDto {
 
-    // 1. DTO សម្រាប់ Request បង្កើតថ្មី
     public record CreateReq(
             @NotBlank(message = "Tenant Identifier is required")
-            String tenantIdentifier,
-            
+            String code,
+            String businessTypeCode,
             @NotBlank(message = "Business Name is required")
             String businessName,
-            
-            String contactPhone,
+            String phone,
+            String email,
+            String address,
+            String status,
             LocalDate subscriptionEndDate
     ) {}
 
-    // 2. DTO សម្រាប់ Request កែប្រែ (Update)
     public record UpdateReq(
             String businessName,
             String contactPhone,
@@ -26,13 +30,19 @@ public class TenantDto {
             LocalDate subscriptionEndDate
     ) {}
 
-    // 3. DTO សម្រាប់ Response បញ្ចេញទៅ Client
     public record Response(
             UUID id,
-            String tenantIdentifier,
+            String code,
             String businessName,
-            String contactPhone,
+            String phone,
+            String email,
             LocalDate subscriptionEndDate,
-            boolean isActive
+            String address,
+            String status,
+            String businessTypeCode,
+            LocalDateTime createdAt,
+            String createdBy,
+            LocalDateTime updatedAt,
+            String updatedBy
     ) {}
 }

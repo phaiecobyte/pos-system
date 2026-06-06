@@ -2,6 +2,7 @@ package com.phaiecobyte.pos.backend.auth.service;
 
 import com.phaiecobyte.pos.backend.auth.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.auth.dto.AuthResponse;
+import com.phaiecobyte.pos.backend.auth.dto.RefreshTokenReq;
 import com.phaiecobyte.pos.backend.auth.dto.RegisterReq;
 import com.phaiecobyte.pos.backend.auth.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,4 +11,6 @@ public interface AuthService {
     AuthResponse authenticate(AuthRequest req);
     AuthResponse register(RegisterReq req);
     void logout(User user, HttpServletRequest request);
+
+    AuthResponse refreshToken(RefreshTokenReq request);
 }

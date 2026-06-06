@@ -1,6 +1,6 @@
-package com.phaiecobyte.pos.backend.product.repository;
+package com.phaiecobyte.pos.backend.catalog.repository;
 
-import com.phaiecobyte.pos.backend.product.model.StockTransaction;
+import com.phaiecobyte.pos.backend.catalog.model.StockTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

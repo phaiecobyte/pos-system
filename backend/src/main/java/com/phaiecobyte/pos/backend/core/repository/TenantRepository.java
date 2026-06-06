@@ -1,6 +1,6 @@
-package com.phaiecobyte.pos.backend.tenant.repository;
+package com.phaiecobyte.pos.backend.core.repository;
 
-import com.phaiecobyte.pos.backend.tenant.entity.Tenant;
+import com.phaiecobyte.pos.backend.core.model.Tenant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface TenantRepository extends JpaRepository<Tenant, UUID> {
-    Optional<Tenant> findByTenantIdentifier(String tenantIdentifier);
-    boolean existsByTenantIdentifier(String tenantIdentifier);
+    Optional<Tenant> findByCode(String code);
+    boolean existsByCode(String code);
 }
