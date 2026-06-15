@@ -1,0 +1,97 @@
+package com.phaiecobyte.pos.backend.core.security;
+
+import com.fasterxml.jackson.databind.ObjectMapper; // <-- បន្ថែម Import នេះ
+import com.phaiecobyte.pos.backend.common.base.ApiResponse; // <-- បន្ថែម Import នេះ
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus; // <-- បន្ថែម Import នេះ
+import org.springframework.http.MediaType; // <-- បន្ថែម Import នេះ
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper; // <-- Spring Boot នឹង Inject ឱ្យដោយស្វ័យប្រវត្តិ
+
+    @Override
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException
+    {
+        final String authHeader = request.getHeader("Authorization");
+
+        // ពិនិត្យឱ្យច្បាស់លាស់ ដោយមិនប្រកាន់តួអក្សរធំតូច (Case-insensitive)
+        if(authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")){
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+        final String jwt = authHeader.substring(7);
+        final String username;
+
+        try {
+            username = jwtService.extractUsername(jwt);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        } catch (ExpiredJwtException e) {
+            log.warn("JWT Token is expired: {}", e.getMessage());
+            handleAuthError(response, HttpStatus.UNAUTHORIZED, "JWT Token is expired! Please login again.");
+            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
+        } catch (JwtException e) {
+            log.warn("Invalid JWT Token: {}", e.getMessage());
+            handleAuthError(response, HttpStatus.UNAUTHORIZED, "Invalid JWT Token!");
+            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
+        } catch (Exception e) {
+            log.error("Error during authentication validation: {}", e.getMessage());
+            handleAuthError(response, HttpStatus.INTERNAL_SERVER_ERROR, "Authentication validation error.");
+            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    // បង្កើត Method ថ្មីសម្រាប់សរសេរ Response ចេញជា JSON ទម្រង់ ApiResponse របស់អ្នក
+    private void handleAuthError(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .message(message)
+                .build();
+
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+    }
+}
