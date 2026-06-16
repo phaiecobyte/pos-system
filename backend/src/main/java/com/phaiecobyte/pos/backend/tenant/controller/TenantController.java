@@ -21,8 +21,7 @@ public class TenantController {
 
     private final TenantService tenantService;
 
-    // មានតែអ្នកមានសិទ្ធិ SUPER_ADMIN ប៉ុណ្ណោះទើបអាចមើលបញ្ជីហាងទាំងអស់បាន
-//    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/list")
     public ResponseEntity<Object> listTenants(
             @ParameterObject Pageable pageable

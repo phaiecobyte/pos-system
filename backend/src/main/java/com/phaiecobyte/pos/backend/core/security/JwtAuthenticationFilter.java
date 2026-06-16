@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final ObjectMapper objectMapper; // <-- Spring Boot នឹង Inject ឱ្យដោយស្វ័យប្រវត្តិ
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
@@ -39,8 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException
     {
         final String authHeader = request.getHeader("Authorization");
+        if(request.getServletPath().equals("/api/v1/auth/refresh-token")){
+            filterChain.doFilter(request,response);
+            return;
+        }
 
-        // ពិនិត្យឱ្យច្បាស់លាស់ ដោយមិនប្រកាន់តួអក្សរធំតូច (Case-insensitive)
         if(authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")){
             filterChain.doFilter(request,response);
             return;
@@ -69,21 +72,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             log.warn("JWT Token is expired: {}", e.getMessage());
             handleAuthError(response, HttpStatus.UNAUTHORIZED, "JWT Token is expired! Please login again.");
-            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
+            return;
         } catch (JwtException e) {
             log.warn("Invalid JWT Token: {}", e.getMessage());
             handleAuthError(response, HttpStatus.UNAUTHORIZED, "Invalid JWT Token!");
-            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
+            return;
         } catch (Exception e) {
             log.error("Error during authentication validation: {}", e.getMessage());
             handleAuthError(response, HttpStatus.INTERNAL_SERVER_ERROR, "Authentication validation error.");
-            return; // <-- សំខាន់! បញ្ឈប់ Filter Chain
+            return;
         }
 
         filterChain.doFilter(request, response);
     }
 
-    // បង្កើត Method ថ្មីសម្រាប់សរសេរ Response ចេញជា JSON ទម្រង់ ApiResponse របស់អ្នក
+    //សម្រាប់សរសេរ Response ចេញជា JSON ទម្រង់ ApiResponse
     private void handleAuthError(HttpServletResponse response, HttpStatus status, String message) throws IOException {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
