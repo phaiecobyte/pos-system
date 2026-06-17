@@ -1,7 +1,6 @@
 package com.phaiecobyte.pos.backend.identity.service.impl;
 
 import com.phaiecobyte.pos.backend.common.exception.AppException;
-import com.phaiecobyte.pos.backend.core.security.JwtService;
 import com.phaiecobyte.pos.backend.identity.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.identity.dto.TokenPair;
 import com.phaiecobyte.pos.backend.identity.model.InvalidatedToken;
@@ -9,8 +8,8 @@ import com.phaiecobyte.pos.backend.identity.model.RefreshToken;
 import com.phaiecobyte.pos.backend.identity.model.User;
 import com.phaiecobyte.pos.backend.identity.repository.InvalidatedTokenRepository;
 import com.phaiecobyte.pos.backend.identity.repository.RefreshTokenRepository;
-import com.phaiecobyte.pos.backend.identity.repository.RoleRepository;
 import com.phaiecobyte.pos.backend.identity.repository.UserRepository;
+import com.phaiecobyte.pos.backend.identity.security.JwtService;
 import com.phaiecobyte.pos.backend.identity.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final InvalidatedTokenRepository invalidatedTokenRepository;
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
@@ -112,6 +108,7 @@ public class AuthServiceImpl implements AuthService {
         return token;
     }
 
+    @Transactional
     @Override
     public TokenPair refreshToken(String refreshToken) {
 

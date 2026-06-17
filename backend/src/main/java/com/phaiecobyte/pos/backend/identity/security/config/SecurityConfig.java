@@ -1,6 +1,6 @@
-package com.phaiecobyte.pos.backend.core.security.config;
+package com.phaiecobyte.pos.backend.identity.security.config;
 
-import com.phaiecobyte.pos.backend.core.security.JwtAuthenticationFilter;
+import com.phaiecobyte.pos.backend.identity.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -1,7 +1,8 @@
-package com.phaiecobyte.pos.backend.core.security;
+package com.phaiecobyte.pos.backend.identity.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper; // <-- បន្ថែម Import នេះ
 import com.phaiecobyte.pos.backend.common.base.ApiResponse; // <-- បន្ថែម Import នេះ
+import com.phaiecobyte.pos.backend.identity.repository.InvalidatedTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -31,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     @Override
     protected void doFilterInternal(
@@ -39,10 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException
     {
         final String authHeader = request.getHeader("Authorization");
-        if(request.getServletPath().equals("/api/v1/auth/refresh-token")){
-            filterChain.doFilter(request,response);
-            return;
-        }
 
         if(authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")){
             filterChain.doFilter(request,response);
@@ -50,8 +48,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
+        if(invalidatedTokenRepository.existsById(jwt)){
+            handleAuthError(
+                    response,
+                    HttpStatus.UNAUTHORIZED,
+                    "Token has been revoked"
+            );
+            return;
+        }
         final String username;
-
         try {
             username = jwtService.extractUsername(jwt);
 
@@ -96,5 +101,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .build();
 
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+    }
+
+    @Override
+    protected boolean shouldNotFilter(
+            HttpServletRequest request
+    ) {
+        return request.getServletPath()
+                .equals("/api/v1/auth/refresh-token");
     }
 }

@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.core.security;
+package com.phaiecobyte.pos.backend.identity.security;
 
 
 import com.phaiecobyte.pos.backend.identity.model.Permission;

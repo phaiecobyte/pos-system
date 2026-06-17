@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.core.security.config;
+package com.phaiecobyte.pos.backend.identity.security.config;
 
 import com.phaiecobyte.pos.backend.identity.model.Role;
 import com.phaiecobyte.pos.backend.identity.model.User;
