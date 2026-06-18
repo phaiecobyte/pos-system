@@ -10,6 +10,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "t_core_tenant")
 @Getter @Setter @AllArgsConstructor @RequiredArgsConstructor
+@Builder
 public class Tenant {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -18,8 +19,8 @@ public class Tenant {
     @Column(name = "code", nullable = false, unique = true, updatable = false)
     private String code;
 
-    @Column(name = "business_name", nullable = false)
-    private String businessName;
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(name = "phone", length = 55)
     private String phone;
@@ -34,7 +35,7 @@ public class Tenant {
     private String address;
 
     @Column(name = "status", length = 10)
-    private String status = Status.A.toString();
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "business_type_code")

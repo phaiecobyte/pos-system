@@ -2,6 +2,7 @@ package com.phaiecobyte.pos.backend.tenant.service.impl;
 
 import com.phaiecobyte.pos.backend.common.exception.AppException;
 import com.phaiecobyte.pos.backend.tenant.dto.TenantDto;
+import com.phaiecobyte.pos.backend.tenant.model.BusinessType;
 import com.phaiecobyte.pos.backend.tenant.model.Tenant;
 import com.phaiecobyte.pos.backend.tenant.mapper.TenantMapper;
 import com.phaiecobyte.pos.backend.tenant.repository.BusinessTypeRepository;
@@ -40,10 +41,8 @@ public class TenantServiceImpl implements TenantService {
     public TenantDto.Response create(TenantDto.CreateReq req) {
         Tenant tenant = tenantMapper.toEntity(req);
 
-        var businessType = businessTypeRepository.findByCode(req.businessTypeCode());
-        if(businessType == null ){
-            throw new AppException(HttpStatus.BAD_REQUEST, "Business type code is not found!");
-        }
+        BusinessType businessType = businessTypeRepository.findByCode(req.businessTypeCode())
+                .orElseThrow(()-> new AppException(HttpStatus.BAD_REQUEST, "Business type code is not found!"));
         tenant.setBusinessType(businessType);
         if (tenantRepository.existsByCode(req.code())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Tenant Identifier is already taken!");
