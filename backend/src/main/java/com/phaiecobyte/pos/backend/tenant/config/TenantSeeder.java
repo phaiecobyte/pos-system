@@ -1,7 +1,5 @@
-package com.phaiecobyte.pos.backend.tenant;
+package com.phaiecobyte.pos.backend.tenant.config;
 
-import com.phaiecobyte.pos.backend.tenant.dto.TenantDto;
-import com.phaiecobyte.pos.backend.tenant.mapper.TenantMapper;
 import com.phaiecobyte.pos.backend.tenant.model.BusinessType;
 import com.phaiecobyte.pos.backend.tenant.model.Tenant;
 import com.phaiecobyte.pos.backend.tenant.repository.BusinessTypeRepository;

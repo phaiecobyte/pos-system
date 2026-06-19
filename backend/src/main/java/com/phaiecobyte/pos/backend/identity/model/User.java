@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.identity.model;
 
-import com.phaiecobyte.pos.backend.common.base.BaseEntity;
+import com.phaiecobyte.pos.backend.core.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +23,7 @@ public class User extends BaseEntity implements UserDetails {
     private String username;
 
     @Column(name = "password", nullable = false)
-    private String password; //encrypt password
+    private String password;
 
     @Column(nullable = false,length = 55)
     private String firstName;

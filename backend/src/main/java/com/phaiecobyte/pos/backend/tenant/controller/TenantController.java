@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.tenant.controller;
 
-import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.common.base.ApiResponse;
 import com.phaiecobyte.pos.backend.tenant.dto.TenantDto;
 import com.phaiecobyte.pos.backend.tenant.service.TenantService;
 import jakarta.validation.Valid;

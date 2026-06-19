@@ -3,7 +3,7 @@ package com.phaiecobyte.pos.backend.identity.controller;
 import com.phaiecobyte.pos.backend.identity.dto.AssignRoleReq;
 import com.phaiecobyte.pos.backend.identity.dto.CreateUserReq;
 import com.phaiecobyte.pos.backend.identity.service.UserService;
-import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.common.base.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;

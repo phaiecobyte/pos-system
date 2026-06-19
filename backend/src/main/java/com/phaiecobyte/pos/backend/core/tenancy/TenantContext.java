@@ -1,17 +1,24 @@
 package com.phaiecobyte.pos.backend.core.tenancy;
 
-public class TenantContext {
-    private static final ThreadLocal<String> CURRENT_TENANT = new ThreadLocal<>();
+import java.util.UUID;
 
-    public static String getCurrentTenant() {
-        return CURRENT_TENANT.get();
+public final class TenantContext {
+
+    private static final ThreadLocal<UUID> TENANT =
+            new ThreadLocal<>();
+
+    private TenantContext() {
     }
 
-    public static void setCurrentTenant(String tenantId) {
-        CURRENT_TENANT.set(tenantId);
+    public static void setTenantId(UUID tenantId) {
+        TENANT.set(tenantId);
+    }
+
+    public static UUID getTenantId() {
+        return TENANT.get();
     }
 
     public static void clear() {
-        CURRENT_TENANT.remove(); // សំខាន់ណាស់ក្នុងការសម្អាតដើម្បីការពារ Memory Leaks
+        TENANT.remove();
     }
 }

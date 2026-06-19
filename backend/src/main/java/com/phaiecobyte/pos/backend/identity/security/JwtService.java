@@ -1,5 +1,6 @@
 package com.phaiecobyte.pos.backend.identity.security;
 
+import com.phaiecobyte.pos.backend.identity.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,10 +22,8 @@ public class JwtService {
     @Value("${app.jwt-expiration-ms}")
     private long jwtExpirationMs;
 
-    // Method ដែលមានការបន្ថែម Custom Claims
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> extraClaims = new HashMap<>();
-        // បញ្ចូល Roles ទៅក្នុង Claims
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
@@ -35,12 +34,28 @@ public class JwtService {
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
-                .setClaims(extraClaims) // បញ្ចូល Claims បន្ថែម (ឧ. Roles, BranchID) មុននឹងបញ្ចូល Subject
+                .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // ប្រើតម្លៃពី Config
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String generateToken(User user, String tenantCode){
+        Map<String,Object> claims = new HashMap<>();
+
+        claims.put("tenantId", user.getTenantId());
+        claims.put("tenantCode", tenantCode);
+
+        List<String> roles = user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        claims.put("roles",roles);
+
+        return generateToken(claims,user);
     }
 
     public String generateRefreshToken(){
@@ -80,5 +95,16 @@ public class JwtService {
 
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    public UUID extractTenantId(String token) {
+        String tenantId = extractAllClaims(token)
+                .get("tenantId", String.class);
+
+        return UUID.fromString(tenantId);
+    }
+    public String extractTenantCode(String token) {
+        return extractAllClaims(token)
+                .get("tenantCode", String.class);
     }
 }

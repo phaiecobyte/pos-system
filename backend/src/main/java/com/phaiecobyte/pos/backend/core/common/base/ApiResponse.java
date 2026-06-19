@@ -1,11 +1,9 @@
-package com.phaiecobyte.pos.backend.common.base;
+package com.phaiecobyte.pos.backend.core.common.base;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder

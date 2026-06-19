@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.catalog.controller;
 
-import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.common.base.ApiResponse;
 import com.phaiecobyte.pos.backend.catalog.dto.CategoryDto;
 import com.phaiecobyte.pos.backend.catalog.service.CategoryService;
 import jakarta.validation.Valid;

@@ -5,7 +5,7 @@ import com.phaiecobyte.pos.backend.identity.model.Role;
 import com.phaiecobyte.pos.backend.identity.mapper.RoleMapper;
 import com.phaiecobyte.pos.backend.identity.repository.RoleRepository;
 import com.phaiecobyte.pos.backend.identity.service.RoleService;
-import com.phaiecobyte.pos.backend.common.exception.AppException;
+import com.phaiecobyte.pos.backend.core.common.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

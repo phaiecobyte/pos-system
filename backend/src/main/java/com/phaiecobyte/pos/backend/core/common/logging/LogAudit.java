@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.common.logging;
+package com.phaiecobyte.pos.backend.core.common.logging;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

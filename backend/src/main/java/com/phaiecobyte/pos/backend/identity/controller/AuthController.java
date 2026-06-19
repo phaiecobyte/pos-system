@@ -1,7 +1,7 @@
 package com.phaiecobyte.pos.backend.identity.controller;
 
-import com.phaiecobyte.pos.backend.common.base.ApiResponse;
-import com.phaiecobyte.pos.backend.common.exception.AppException;
+import com.phaiecobyte.pos.backend.core.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.common.exception.AppException;
 import com.phaiecobyte.pos.backend.identity.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.identity.dto.AuthResponse;
 import com.phaiecobyte.pos.backend.identity.dto.TokenPair;
@@ -11,8 +11,6 @@ import com.phaiecobyte.pos.backend.identity.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

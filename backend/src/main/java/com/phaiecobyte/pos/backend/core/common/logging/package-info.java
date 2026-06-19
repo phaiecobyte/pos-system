@@ -1,2 +1,2 @@
 @org.springframework.modulith.NamedInterface("logging")
-package com.phaiecobyte.pos.backend.common.logging;
+package com.phaiecobyte.pos.backend.core.common.logging;

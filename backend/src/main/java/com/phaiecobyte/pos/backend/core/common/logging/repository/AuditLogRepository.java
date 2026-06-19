@@ -1,6 +1,6 @@
-package com.phaiecobyte.pos.backend.common.logging.repository;
+package com.phaiecobyte.pos.backend.core.common.logging.repository;
 
-import com.phaiecobyte.pos.backend.common.logging.model.AuditLog;
+import com.phaiecobyte.pos.backend.core.common.logging.model.AuditLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.UUID;

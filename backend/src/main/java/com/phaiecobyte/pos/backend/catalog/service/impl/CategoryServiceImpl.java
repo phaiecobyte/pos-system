@@ -1,8 +1,8 @@
 package com.phaiecobyte.pos.backend.catalog.service.impl;
 
-import com.phaiecobyte.pos.backend.common.logging.LogAudit;
+import com.phaiecobyte.pos.backend.core.common.logging.LogAudit;
 import com.phaiecobyte.pos.backend.catalog.dto.CategoryDto;
-import com.phaiecobyte.pos.backend.common.exception.AppException;
+import com.phaiecobyte.pos.backend.core.common.exception.AppException;
 import com.phaiecobyte.pos.backend.catalog.mapper.CategoryMapper;
 import com.phaiecobyte.pos.backend.catalog.model.Category;
 import com.phaiecobyte.pos.backend.catalog.repository.CategoryRepository;

@@ -1,8 +1,8 @@
-package com.phaiecobyte.pos.backend.common.logging;
+package com.phaiecobyte.pos.backend.core.common.logging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.phaiecobyte.pos.backend.common.logging.service.AuditLogService;
+import com.phaiecobyte.pos.backend.core.common.logging.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -20,12 +20,9 @@ import java.util.UUID;
 public class AuditLogAspect {
 
     private final AuditLogService auditLogService;
-    // ប្រើ ObjectMapper ដើម្បីបម្លែង Object ទៅជា JSON String
-//    private final ObjectMapper objectMapper;
-    // ២. បង្កើតវាដោយផ្ទាល់ជា private variable
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    // ផ្លាស់ប្តូរមកប្រើ @Around ជំនួស @AfterReturning
+
     @Around("@annotation(logAudit)")
     public Object logAround(ProceedingJoinPoint joinPoint, LogAudit logAudit) throws Throwable {
 

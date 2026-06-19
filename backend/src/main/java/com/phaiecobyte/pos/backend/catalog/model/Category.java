@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.catalog.model;
 
-import com.phaiecobyte.pos.backend.common.base.BaseEntity;
+import com.phaiecobyte.pos.backend.core.common.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

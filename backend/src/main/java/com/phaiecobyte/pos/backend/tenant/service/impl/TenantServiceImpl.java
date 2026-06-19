@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.tenant.service.impl;
 
-import com.phaiecobyte.pos.backend.common.exception.AppException;
+import com.phaiecobyte.pos.backend.core.common.exception.AppException;
 import com.phaiecobyte.pos.backend.tenant.dto.TenantDto;
 import com.phaiecobyte.pos.backend.tenant.model.BusinessType;
 import com.phaiecobyte.pos.backend.tenant.model.Tenant;

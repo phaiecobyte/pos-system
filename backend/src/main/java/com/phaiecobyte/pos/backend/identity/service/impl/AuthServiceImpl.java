@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.identity.service.impl;
 
-import com.phaiecobyte.pos.backend.common.exception.AppException;
+import com.phaiecobyte.pos.backend.core.common.exception.AppException;
 import com.phaiecobyte.pos.backend.identity.dto.AuthRequest;
 import com.phaiecobyte.pos.backend.identity.dto.TokenPair;
 import com.phaiecobyte.pos.backend.identity.model.InvalidatedToken;
@@ -11,6 +11,7 @@ import com.phaiecobyte.pos.backend.identity.repository.RefreshTokenRepository;
 import com.phaiecobyte.pos.backend.identity.repository.UserRepository;
 import com.phaiecobyte.pos.backend.identity.security.JwtService;
 import com.phaiecobyte.pos.backend.identity.service.AuthService;
+import com.phaiecobyte.pos.backend.tenant.api.TenantLookup;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final TenantLookup tenantLookup;
 
     @Value("${app.jwt-refresh-expiration-ms}")
     private long refreshExpirationMs;
@@ -44,14 +47,21 @@ public class AuthServiceImpl implements AuthService {
     public TokenPair authenticate(AuthRequest request) {
 
         try {
+
+            var tenant = tenantLookup.findByCode(request.getTenantCode())
+                            .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND,"Tenant is not found"));
+
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
 
-            User user = userRepository.findByUsername(request.getUsername())
+            User user = userRepository.findByUsernameAndTenantId(
+                            request.getUsername(),
+                            tenant.id()
+                    )
                     .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND, "User not found!"));
 
-            String accessToken = jwtService.generateToken(user);
+            String accessToken = jwtService.generateToken(user, tenant.code());
 
             String refreshTokenStr = jwtService.generateRefreshToken();
             saveRefreshToken(user, refreshTokenStr);
@@ -134,4 +144,6 @@ public class AuthServiceImpl implements AuthService {
                 newRefreshToken
         );
     }
+
+
 }

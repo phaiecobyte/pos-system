@@ -2,7 +2,7 @@ package com.phaiecobyte.pos.backend.identity.controller;
 
 import com.phaiecobyte.pos.backend.identity.dto.RoleDto;
 import com.phaiecobyte.pos.backend.identity.service.RoleService;
-import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.common.base.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

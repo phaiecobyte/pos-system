@@ -1,8 +1,8 @@
 package com.phaiecobyte.pos.backend.catalog.service.impl;
 
 import com.phaiecobyte.pos.backend.catalog.enums.TransactionType;
-import com.phaiecobyte.pos.backend.common.exception.AppException;
-import com.phaiecobyte.pos.backend.common.logging.LogAudit;
+import com.phaiecobyte.pos.backend.core.common.exception.AppException;
+import com.phaiecobyte.pos.backend.core.common.logging.LogAudit;
 import com.phaiecobyte.pos.backend.catalog.dto.ProductDto;
 import com.phaiecobyte.pos.backend.catalog.dto.StockDto;
 import com.phaiecobyte.pos.backend.catalog.mapper.ProductMapper;

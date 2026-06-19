@@ -1,7 +1,8 @@
 package com.phaiecobyte.pos.backend.identity.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper; // <-- បន្ថែម Import នេះ
-import com.phaiecobyte.pos.backend.common.base.ApiResponse; // <-- បន្ថែម Import នេះ
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.phaiecobyte.pos.backend.core.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.tenancy.TenantContext;
 import com.phaiecobyte.pos.backend.identity.repository.InvalidatedTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -12,8 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus; // <-- បន្ថែម Import នេះ
-import org.springframework.http.MediaType; // <-- បន្ថែម Import នេះ
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -56,6 +58,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             return;
         }
+        UUID tenantId = jwtService.extractTenantId(jwt);
+        TenantContext.setTenantId(tenantId);
         final String username;
         try {
             username = jwtService.extractUsername(jwt);
@@ -74,6 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
+            filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
             log.warn("JWT Token is expired: {}", e.getMessage());
             handleAuthError(response, HttpStatus.UNAUTHORIZED, "JWT Token is expired! Please login again.");
@@ -86,12 +91,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.error("Error during authentication validation: {}", e.getMessage());
             handleAuthError(response, HttpStatus.INTERNAL_SERVER_ERROR, "Authentication validation error.");
             return;
+        }finally {
+            TenantContext.clear();
         }
 
-        filterChain.doFilter(request, response);
     }
 
-    //សម្រាប់សរសេរ Response ចេញជា JSON ទម្រង់ ApiResponse
     private void handleAuthError(HttpServletResponse response, HttpStatus status, String message) throws IOException {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

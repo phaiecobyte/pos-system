@@ -1,6 +1,6 @@
 package com.phaiecobyte.pos.backend.tenant.controller;
 
-import com.phaiecobyte.pos.backend.common.base.ApiResponse;
+import com.phaiecobyte.pos.backend.core.common.base.ApiResponse;
 import com.phaiecobyte.pos.backend.tenant.model.BusinessType;
 import com.phaiecobyte.pos.backend.tenant.service.impl.BusinessTypeService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.phaiecobyte.pos.backend.common.base.Constant.CORE_URL;
+import static com.phaiecobyte.pos.backend.core.common.base.Constant.CORE_URL;
 
 @RestController
 @RequiredArgsConstructor
