@@ -1,48 +1,49 @@
 package com.phaiecobyte.pos.backend.identity.model;
 
-import com.phaiecobyte.pos.backend.core.common.base.BaseEntity;
+import com.phaiecobyte.pos.backend.core.persistence.entity.TenantAwareEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
-@Table(name = "t_auth_user")
+@Table(name = "t_identity_user")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User extends BaseEntity implements UserDetails {
+public class User extends TenantAwareEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @Column(nullable = false, unique = true, length = 55)
+    @Column(name = "username",nullable = false, unique = true, length = 55)
     private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(nullable = false,length = 55)
+    @Column(name = "first_name",length = 55)
     private String firstName;
 
-    @Column(nullable = false,length = 55)
+    @Column(name = "last_name", length = 55)
     private String lastName;
 
-    @Column(unique = true,length = 55)
+    @Column(name = "email",unique = true,length = 55)
     private String email;
 
+    @Column(name = "phone", unique = true,length = 20)
+    private String phone;
 
     @Column(name = "is_active")
-    private boolean active = true;
+    private boolean isActive = true;
 
 
-    // បង្កើតតារាងកណ្តាល user_roles ដោយស្វ័យប្រវត្តិ
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "t_auth_user_role",
+            name = "t_identity_user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
@@ -50,40 +51,4 @@ public class User extends BaseEntity implements UserDetails {
     @ToString.Exclude
     private Set<Role> roles;
 
-
-
-    // ការ Mapping យក Roles និង Permissions បញ្ចូលគ្នាដើម្បីឱ្យ Spring Security ស្គាល់
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        for (Role role : roles) {
-            // បន្ថែម Role ចូល (ត្រូវមានពាក្យ ROLE_ នៅខាងមុខ)
-            String roleName = role.getName().startsWith("ROLE_") ? role.getName() : "ROLE_" + role.getName();
-            authorities.add(new SimpleGrantedAuthority(roleName));
-            // បន្ថែម Permissions ទាំងអស់របស់ Role នោះចូល
-            for (Permission permission : role.getPermissions()) {
-                authorities.add(new SimpleGrantedAuthority(permission.getName()));
-            }
-        }
-        return authorities;
-    }
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return active;
-    }
 }

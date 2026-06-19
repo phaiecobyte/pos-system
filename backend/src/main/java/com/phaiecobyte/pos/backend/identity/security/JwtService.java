@@ -41,21 +41,24 @@ public class JwtService {
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+    public String generateToken(
+            UserDetails userDetails,
+            UUID tenantId,
+            String tenantCode
+    ) {
+        Map<String, Object> claims = new HashMap<>();
 
-    public String generateToken(User user, String tenantCode){
-        Map<String,Object> claims = new HashMap<>();
-
-        claims.put("tenantId", user.getTenantId());
+        claims.put("tenantId", tenantId);
         claims.put("tenantCode", tenantCode);
 
-        List<String> roles = user.getAuthorities()
+        List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        claims.put("roles",roles);
+        claims.put("roles", roles);
 
-        return generateToken(claims,user);
+        return generateToken(claims, userDetails);
     }
 
     public String generateRefreshToken(){

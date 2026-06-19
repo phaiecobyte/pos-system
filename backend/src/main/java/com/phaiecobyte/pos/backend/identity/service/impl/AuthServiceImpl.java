@@ -10,10 +10,12 @@ import com.phaiecobyte.pos.backend.identity.repository.InvalidatedTokenRepositor
 import com.phaiecobyte.pos.backend.identity.repository.RefreshTokenRepository;
 import com.phaiecobyte.pos.backend.identity.repository.UserRepository;
 import com.phaiecobyte.pos.backend.identity.security.JwtService;
+import com.phaiecobyte.pos.backend.identity.security.SecurityUser;
 import com.phaiecobyte.pos.backend.identity.service.AuthService;
 import com.phaiecobyte.pos.backend.tenant.api.TenantLookup;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,15 +26,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final InvalidatedTokenRepository invalidatedTokenRepository;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -59,9 +64,22 @@ public class AuthServiceImpl implements AuthService {
                             request.getUsername(),
                             tenant.id()
                     )
-                    .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND, "User not found!"));
+                    .orElseThrow(() ->
+                            new AppException(
+                                    HttpStatus.NOT_FOUND,
+                                    "User not found!"
+                            )
+                    );
 
-            String accessToken = jwtService.generateToken(user, tenant.code());
+            SecurityUser securityUser =
+                    new SecurityUser(user);
+
+            String accessToken =
+                    jwtService.generateToken(
+                            securityUser,
+                            user.getTenantId(),
+                            tenant.code()
+                    );
 
             String refreshTokenStr = jwtService.generateRefreshToken();
             saveRefreshToken(user, refreshTokenStr);
@@ -79,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
         refreshToken.setUser(user);
         refreshToken.setToken(token);
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshExpirationMs));
+        refreshToken.setExpiryDate(LocalDateTime.now().plus(Duration.ofMillis(refreshExpirationMs)));
         refreshTokenRepository.save(refreshToken);
     }
 
@@ -111,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     private RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+        if (token.getExpiryDate().compareTo(ChronoLocalDateTime.from(Instant.now())) < 0) {
             refreshTokenRepository.delete(token);
             throw new AppException(HttpStatus.FORBIDDEN, "Refresh token was expired. Please make a new sign in request");
         }
@@ -132,7 +150,9 @@ public class AuthServiceImpl implements AuthService {
 
         User user = token.getUser();
 
-        String accessToken = jwtService.generateToken(user);
+        SecurityUser securityUser = new SecurityUser(user);
+
+        String accessToken = jwtService.generateToken(securityUser);
 
         String newRefreshToken =
                 jwtService.generateRefreshToken();

@@ -1,8 +1,11 @@
 package com.phaiecobyte.pos.backend.identity.config;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phaiecobyte.pos.backend.identity.repository.UserRepository;
+import com.phaiecobyte.pos.backend.identity.security.SecurityUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,13 +19,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class ApplicationConfig{
-
     private final UserRepository userRepository;
 
     @Bean
     public UserDetailsService userDetailsService() {
+        log.info("==========================test========================");
         return username -> userRepository.findByUsername(username)
+                .map(SecurityUser::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 

@@ -1,27 +1,33 @@
 package com.phaiecobyte.pos.backend.identity.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.phaiecobyte.pos.backend.core.common.base.BaseEntity;
+import com.phaiecobyte.pos.backend.core.persistence.entity.TenantAwareEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
-@Table(name = "t_auth_role")
+@Table(name = "t_identity_role")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role extends BaseEntity {
+public class Role extends TenantAwareEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
     @Column(name = "description")
     private String description;
 
-    // បង្កើតតារាងកណ្តាល role_permissions ដោយស្វ័យប្រវត្តិ
+    //===================== RELATIONSHIP ==========================
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "t_auth_role_perm",
+            name = "t_identity_role_perm",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )

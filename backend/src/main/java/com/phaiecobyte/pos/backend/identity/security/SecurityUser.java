@@ -4,6 +4,7 @@ package com.phaiecobyte.pos.backend.identity.security;
 import com.phaiecobyte.pos.backend.identity.model.Permission;
 import com.phaiecobyte.pos.backend.identity.model.Role;
 import com.phaiecobyte.pos.backend.identity.model.User;
+import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,7 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+@Getter
 public class SecurityUser  implements UserDetails{
     private final User user;
 
@@ -70,6 +73,14 @@ public class SecurityUser  implements UserDetails{
 
     public User getUser() {
         return user;
+    }
+
+    public UUID getUserId(){
+        return user.getId();
+    }
+
+    public UUID getTenantId(){
+        return user.getTenantId();
     }
 
 }
