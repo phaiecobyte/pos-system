@@ -1,6 +1,5 @@
 package com.phaiecobyte.pos.backend.identity.model;
 
-import com.phaiecobyte.pos.backend.core.persistence.entity.TenantAwareEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +9,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "t_identity_permission")
 @Getter @Setter
-public class Permission extends TenantAwareEntity {
+public class Permission{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

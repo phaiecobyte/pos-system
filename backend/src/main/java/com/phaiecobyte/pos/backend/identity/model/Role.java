@@ -9,7 +9,18 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "t_identity_role")
+@Table(
+        name = "t_identity_role",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_role_tenant_name",
+                        columnNames = {
+                                "tenant_id",
+                                "name"
+                        }
+                )
+        }
+)
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +29,7 @@ public class Role extends TenantAwareEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false, length = 55)
     private String name;
 
     @Column(name = "description")

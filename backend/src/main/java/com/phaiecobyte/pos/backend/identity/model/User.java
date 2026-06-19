@@ -9,17 +9,28 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "t_identity_user")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(
+        name = "t_identity_user",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_user_tenant_username",
+                        columnNames = {
+                                "tenant_id",
+                                "username"
+                        }
+                )
+        }
+)
 public class User extends TenantAwareEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "username",nullable = false, unique = true, length = 55)
+    @Column(name = "username",nullable = false, length = 55)
     private String username;
 
     @Column(name = "password", nullable = false)

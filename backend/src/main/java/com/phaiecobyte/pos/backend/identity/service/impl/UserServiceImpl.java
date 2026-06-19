@@ -11,6 +11,7 @@ import com.phaiecobyte.pos.backend.identity.repository.UserRepository;
 import com.phaiecobyte.pos.backend.identity.service.UserService;
 import com.phaiecobyte.pos.backend.core.common.logging.LogAudit;
 import com.phaiecobyte.pos.backend.core.common.exception.AppException;
+import com.phaiecobyte.pos.backend.tenant.api.TenantLookup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,11 +31,12 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
+    private final TenantLookup tenantLookup;
 
     @Override
     @LogAudit(action = "READ",moduleName = "AUTH", entityName = "t_auth_user", defaultReason = "")
     public Page<UserDto> list(Pageable pageable) {
-        return userRepository.findAll(pageable)
+        return userRepository.findByTenantId(tenantLookup.getCurrentTenantId(),pageable)
                 .map(userMapper::toDto);
     }
 
@@ -42,11 +44,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @LogAudit(action = "CREATE",moduleName = "AUTH", entityName = "t_auth_user", defaultReason = "")
     public UserDto create(CreateUserReq req) {
-        if(userRepository.findByUsername(req.getUsername()).isPresent()){
+        if(userRepository.findByUsernameAndTenantId(req.getUsername(),tenantLookup.getCurrentTenantId()).isPresent()){
             throw new AppException(HttpStatus.BAD_REQUEST,"Username is already exist");
         }
 
         User user = userMapper.toEntity(req);
+        user.setTenantId(tenantLookup.getCurrentTenantId());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setActive(true);
 
@@ -59,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @LogAudit(action = "UPDATE",moduleName = "AUTH", entityName = "t_auth_user", defaultReason = "")
     public UserDto toggleUserStatus(UUID userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndTenantId(userId,tenantLookup.getCurrentTenantId())
                 .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND, "User not found!"));
 
         user.setActive(!user.isActive());
@@ -71,7 +74,7 @@ public class UserServiceImpl implements UserService {
     public UserDto assignRole(UUID id, AssignRoleReq req) {
         User user = userRepository.findById(id)
                 .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND,"User not found"));
-        Set<Role> roles = new HashSet<>(roleRepository.findAllById(req.getRoleIds()));
+        Set<Role> roles = new HashSet<>(roleRepository.findByIdInAndTenantId(req.getRoleIds(),tenantLookup.getCurrentTenantId()));
 
         if(roles.isEmpty()){
             throw new RuntimeException("Invalid roles or not exist in system");

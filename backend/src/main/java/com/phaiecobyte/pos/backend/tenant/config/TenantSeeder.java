@@ -55,24 +55,29 @@ public class TenantSeeder implements CommandLineRunner {
             return;
         }
 
-        BusinessType retailType = businessTypeRepository
-                .findByCode("RETAIL")
-                .orElseThrow(() -> new RuntimeException("Business type RETAIL not found"));
+        for (int i=0;i<=100;i++){
+            BusinessType retailType = businessTypeRepository
+                    .findByCode("RETAIL")
+                    .orElseThrow(() -> new RuntimeException("Business type RETAIL not found"));
 
-        Tenant tenant = Tenant.builder()
-                .code("SH-PH")
-                .name("Phai Store")
-                .businessType(retailType)
-                .phone("0965799628")
-                .email("phaiecobyte@gmail.com")
-                .address("Phnom Penh")
-                .status("A")
-                .createdAt(LocalDateTime.now())
-                .createdBy("SYS")
-                .build();
+            Tenant tenant = Tenant.builder()
+                    .code("SHOP-"+i)
+                    .name("Store "+i)
+                    .businessType(retailType)
+                    .phone("0965799628")
+                    .email("phaiecobyte@gmail.com")
+                    .address("Phnom Penh")
+                    .status("A")
+                    .createdAt(LocalDateTime.now())
+                    .createdBy("SYS")
+                    .build();
 
-        tenantRepository.save(tenant);
+            tenantRepository.save(tenant);
 
-        log.info("Default tenant seeded successfully");
+            log.info("Default tenant seeded successfully");
+        }
+
     }
+
+
 }
