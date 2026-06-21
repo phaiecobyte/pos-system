@@ -1,5 +1,7 @@
 package com.phaiecobyte.pos.backend.tenant.config;
 
+import com.phaiecobyte.pos.backend.tenant.dto.TenantDto;
+import com.phaiecobyte.pos.backend.tenant.mapper.TenantMapper;
 import com.phaiecobyte.pos.backend.tenant.model.BusinessType;
 import com.phaiecobyte.pos.backend.tenant.model.Tenant;
 import com.phaiecobyte.pos.backend.tenant.repository.BusinessTypeRepository;
@@ -9,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -17,66 +19,54 @@ import java.util.List;
 @Slf4j
 public class TenantSeeder implements CommandLineRunner {
     private final TenantRepository tenantRepository;
+    private final TenantMapper tenantMapper;
     private final BusinessTypeRepository businessTypeRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        seedBusinessType();
-        seedTenant();
+        seedBusinessTyp();
+        seedTenantRetailer();
     }
 
-    public void seedBusinessType() {
-
-        if (businessTypeRepository.count() > 0) {
-            return;
-        }
-
-        List<BusinessType> businessTypes = List.of(
-                new BusinessType("RETAIL", "Retail Store"),
-                new BusinessType("RESTAURANT", "Restaurant"),
-                new BusinessType("CAFE", "Cafe"),
-                new BusinessType("PHARMACY", "Pharmacy"),
-                new BusinessType("SALON", "Beauty Salon"),
-                new BusinessType("GROCERY", "Grocery Store"),
-                new BusinessType("SUPERMARKET", "Supermarket"),
-                new BusinessType("MINIMART", "Mini Mart"),
-                new BusinessType("CONVENIENCE", "Convenience Store"),
-                new BusinessType("WHOLESALE", "Wholesale Business")
-        );
-
-        businessTypeRepository.saveAll(businessTypes);
-
-        log.info("Business types seeded successfully");
-    }
-
-    public void seedTenant() {
-
+    public void seedTenantRetailer() {
         if (tenantRepository.count() > 0) {
             return;
         }
 
-        for (int i=0;i<=100;i++){
-            BusinessType retailType = businessTypeRepository
-                    .findByCode("RETAIL")
-                    .orElseThrow(() -> new RuntimeException("Business type RETAIL not found"));
+        for (int i=1;i<=2;i++){
+            TenantDto.CreateReq dto = new TenantDto.CreateReq(
+                    "SHOP-RETAIL"+i,
+                    "RETAIL",
+                    "Phai Store"+i,
+                    "0965799628",
+                    "phaiecobyte@gmail.com",
+                    "Phnom Penh",
+                    "A",
+                    null
+            );
 
-            Tenant tenant = Tenant.builder()
-                    .code("SHOP-"+i)
-                    .name("Store "+i)
-                    .businessType(retailType)
-                    .phone("0965799628")
-                    .email("phaiecobyte@gmail.com")
-                    .address("Phnom Penh")
-                    .status("A")
-                    .createdAt(LocalDateTime.now())
-                    .createdBy("SYS")
-                    .build();
-
+            Tenant tenant = tenantMapper.toEntity(dto);
             tenantRepository.save(tenant);
-
             log.info("Default tenant seeded successfully");
         }
 
+    }
+
+    public void seedBusinessTyp(){
+        if(businessTypeRepository.count() > 0 ){
+            log.info("=============== No seed business type ==============");
+            return;
+        }
+        log.info("===================== start seed business type ==================");
+        List<BusinessType> types = new ArrayList<>();
+
+        types.add(new BusinessType("COSMETICS","Cosmetics and Beauty Store",null));
+        types.add(new BusinessType("RETAIL","Retail Store",null));
+        types.add(new BusinessType("RESTAURANT","Restaurant",null));
+        types.add(new BusinessType("GUESTHOUSE","Guest House",null));
+        types.add(new BusinessType("PHARMACY","Pharmarcy",null));
+
+        businessTypeRepository.saveAll(types);
     }
 
 

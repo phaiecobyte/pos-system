@@ -2,13 +2,12 @@ package com.phaiecobyte.pos.backend.core.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter @Setter
 @MappedSuperclass
+@Getter @Setter @ToString
 public abstract class AuditEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;

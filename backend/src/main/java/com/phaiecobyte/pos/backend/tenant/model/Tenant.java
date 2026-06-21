@@ -1,17 +1,16 @@
 package com.phaiecobyte.pos.backend.tenant.model;
 
+import com.phaiecobyte.pos.backend.core.persistence.entity.AuditEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "t_core_tenant")
-@Getter @Setter @AllArgsConstructor @RequiredArgsConstructor
-@Builder
-public class Tenant {
+@Getter @Setter
+public class Tenant extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -22,34 +21,22 @@ public class Tenant {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "phone", length = 55)
+    @Column(name = "phone", length = 35)
     private String phone;
 
-    @Column(name = "email", length = 55)
+    @Column(name = "email", length = 35)
     private String email;
 
     @Column(name = "subscription_end_date")
     private LocalDate subscriptionEndDate;
 
-    @Column(name = "address", length = 55)
+    @Column(name = "address", length = 100)
     private String address;
 
     @Column(name = "status", length = 10)
     private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "business_type_code")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "business_type_id")
     private BusinessType businessType;
-
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "created_by", length = 55)
-    private String createdBy;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "updated_by", length = 55)
-    private String updatedBy;
 }

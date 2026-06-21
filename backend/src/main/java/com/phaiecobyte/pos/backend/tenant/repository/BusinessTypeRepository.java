@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface BusinessTypeRepository extends JpaRepository<BusinessType, UUID> {
-    Optional<BusinessType> findByCode(String code);
+    Optional<BusinessType> findById(String id);
 }

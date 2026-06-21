@@ -28,13 +28,13 @@ public class SecurityUser  implements UserDetails{
         Set<GrantedAuthority> authorities = new HashSet<>();
 
         for(Role role : user.getRoles()){
-            String roleName = role.getName().startsWith("ROLE_")
-                    ? role.getName()
-                    : "ROLE_" + role.getName();
+            String roleName = role.getCode().startsWith("ROLE_")
+                    ? role.getCode()
+                    : "ROLE_" + role.getCode();
             authorities.add(new SimpleGrantedAuthority(roleName));
 
             for(Permission permission : role.getPermissions()){
-                authorities.add(new SimpleGrantedAuthority(permission.getName())
+                authorities.add(new SimpleGrantedAuthority(permission.getId())
                 );
             }
         }

@@ -16,7 +16,7 @@ import java.util.UUID;
                         name = "uk_role_tenant_name",
                         columnNames = {
                                 "tenant_id",
-                                "name"
+                                "code"
                         }
                 )
         }
@@ -29,11 +29,17 @@ public class Role extends TenantAwareEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "name", nullable = false, length = 55)
+    @Column(name = "code", nullable = false, length = 55)
+    private String code;
+
+    @Column(length = 55)
     private String name;
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "is_system")
+    private boolean isSystem = false;
 
     //===================== RELATIONSHIP ==========================
     @ManyToMany(fetch = FetchType.LAZY)

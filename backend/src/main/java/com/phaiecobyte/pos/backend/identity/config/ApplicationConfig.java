@@ -25,7 +25,6 @@ public class ApplicationConfig{
 
     @Bean
     public UserDetailsService userDetailsService() {
-        log.info("==========================test========================");
         return username -> userRepository.findByUsername(username)
                 .map(SecurityUser::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

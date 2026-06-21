@@ -7,10 +7,11 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface TenantMapper {
 
-    @Mapping(source = "businessType.code", target = "businessTypeCode")
+    @Mapping(source = "businessType.id", target = "businessTypeId")
     TenantDto.Response toDto(Tenant entity);
 
     @Mapping(target = "businessType", ignore = true)
+    @Mapping(target = "businessType.id", source = "businessTypeId")
     Tenant toEntity(TenantDto.CreateReq dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

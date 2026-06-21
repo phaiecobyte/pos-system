@@ -10,9 +10,9 @@ public class TenantDto {
     public record CreateReq(
             @NotBlank(message = "Tenant Identifier is required")
             String code,
-            String businessTypeCode,
+            String businessTypeId,
             @NotBlank(message = "Business Name is required")
-            String businessName,
+            String name,
             String phone,
             String email,
             String address,
@@ -36,7 +36,7 @@ public class TenantDto {
             LocalDate subscriptionEndDate,
             String address,
             String status,
-            String businessTypeCode,
+            String businessTypeId,
             LocalDateTime createdAt,
             String createdBy,
             LocalDateTime updatedAt,

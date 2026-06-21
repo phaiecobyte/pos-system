@@ -1,6 +1,5 @@
 package com.phaiecobyte.pos.backend.identity.security;
 
-import com.phaiecobyte.pos.backend.identity.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -19,7 +19,7 @@ public interface UserMapper {
 
     // Role -> String
     default String map(Role role) {
-        return role.getName();
+        return role.getCode();
     }
 
     // UUID -> Role

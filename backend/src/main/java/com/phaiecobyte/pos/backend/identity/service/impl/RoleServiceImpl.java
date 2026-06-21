@@ -42,7 +42,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleDto update(UUID uuid, RoleDto dto) {
         Role role = roleRepository.findRoleByIdAndTenantId(uuid,tenantLookup.getCurrentTenantId())
                 .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND,"Role is not found"));
-        role.setName(dto.getName());
+        role.setCode(dto.getName());
         role.setDescription(dto.getDescription());
         return roleMapper.toDto(role);
     }

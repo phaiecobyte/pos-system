@@ -9,14 +9,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "t_core_business_type")
-@AllArgsConstructor @NoArgsConstructor
-@Getter @Setter
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor
 public class BusinessType {
     @Id
-    @Column(name = "code", nullable = false, unique = true, updatable = false)
-    private String code;
-    @Column(length = 55)
+    @Column(name = "id", length = 55)
+    private String id;
     private String description;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
