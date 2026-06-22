@@ -12,6 +12,8 @@ import com.phaiecobyte.pos.backend.identity.repository.UserRepository;
 import com.phaiecobyte.pos.backend.identity.security.JwtService;
 import com.phaiecobyte.pos.backend.identity.security.SecurityUser;
 import com.phaiecobyte.pos.backend.identity.service.AuthService;
+import com.phaiecobyte.pos.backend.identity.service.LoginAttemptService;
+import com.phaiecobyte.pos.backend.tenant.repository.TenantRepository;
 import com.phaiecobyte.pos.backend.tenant.api.TenantLookup;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,8 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final TenantLookup tenantLookup;
+    private final TenantRepository tenantRepository;
+    private final LoginAttemptService loginAttemptService;
 
     @Value("${app.jwt-refresh-expiration-ms}")
     private long refreshExpirationMs;
@@ -52,6 +56,12 @@ public class AuthServiceImpl implements AuthService {
 
             var tenant = tenantLookup.findByCode(request.getTenantCode())
                             .orElseThrow(()-> new AppException(HttpStatus.NOT_FOUND,"Tenant is not found"));
+
+            // Check if account is locked due to brute-force attempts
+            if (loginAttemptService.isAccountLocked(request.getUsername(), tenant.id())) {
+                throw new AppException(HttpStatus.LOCKED, 
+                    "Account is temporarily locked due to multiple failed login attempts. Please try again later.");
+            }
 
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -81,9 +91,21 @@ public class AuthServiceImpl implements AuthService {
             String refreshTokenStr = jwtService.generateRefreshToken();
             saveRefreshToken(user, refreshTokenStr);
 
+            // Record successful authentication attempt
+            loginAttemptService.recordSuccessfulAttempt(request.getUsername(), tenant.id());
+
             return new TokenPair(accessToken,refreshTokenStr);
 
         }catch (BadCredentialsException e){
+            // Extract tenant for logging failed attempt
+            try {
+                var tenant = tenantLookup.findByCode(request.getTenantCode()).orElse(null);
+                if (tenant != null) {
+                    loginAttemptService.recordFailedAttempt(request.getUsername(), tenant.id());
+                }
+            } catch (Exception ex) {
+                log.debug("Could not record failed login attempt: {}", ex.getMessage());
+            }
             throw new AppException(HttpStatus.UNAUTHORIZED, "Invalid Username or Password!");
         }
     }
@@ -149,7 +171,18 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        String accessToken = jwtService.generateToken(securityUser);
+        // Get tenant info to include in new token - preserve tenant context
+        var tenant = tenantRepository.findById(user.getTenantId())
+                .orElseThrow(() -> new AppException(
+                        HttpStatus.NOT_FOUND,
+                        "Tenant not found"
+                ));
+
+        String accessToken = jwtService.generateToken(
+                securityUser,
+                user.getTenantId(),
+                tenant.getCode()
+        );
 
         String newRefreshToken =
                 jwtService.generateRefreshToken();
