@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.Function;
 
@@ -20,6 +21,8 @@ public class JwtService {
 
     @Value("${app.jwt-expiration-ms}")
     private long jwtExpirationMs;
+
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> extraClaims = new HashMap<>();
@@ -61,7 +64,9 @@ public class JwtService {
     }
 
     public String generateRefreshToken(){
-        return UUID.randomUUID().toString();
+        byte[] randomBytes = new byte[32]; // 256 bits
+        secureRandom.nextBytes(randomBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
 
     public String extractUsername(String token) {

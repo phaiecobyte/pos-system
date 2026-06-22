@@ -3,6 +3,7 @@ package com.phaiecobyte.pos.backend.identity.security.config;
 import com.phaiecobyte.pos.backend.identity.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -27,6 +29,15 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+
+    @Value("${app.cors.allowed-origins:http://localhost:4200}")
+    private String allowedOrigins;
+
+    @Value("${app.cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS}")
+    private String allowedMethods;
+
+    @Value("${app.cookie.secure:false}")
+    private boolean secureCookie;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -80,11 +91,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // អនុញ្ញាតទាំង localhost:4200 (Angular) និង localhost លេខផ្សេងៗពេលអភិវឌ្ឍន៍
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*")); // អនុញ្ញាត Headers ទាំងអស់ដើម្បីកុំឱ្យមានបញ្ហា CORS
-        configuration.setAllowCredentials(true); // សំខាន់បើត្រូវការប្រើ Cookies ឬ Authentication headers
+        // Parse allowed origins from configuration
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .toList();
+        configuration.setAllowedOrigins(origins);
+        
+        // Parse allowed methods from configuration
+        List<String> methods = Arrays.stream(allowedMethods.split(","))
+                .map(String::trim)
+                .toList();
+        configuration.setAllowedMethods(methods);
+        
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
