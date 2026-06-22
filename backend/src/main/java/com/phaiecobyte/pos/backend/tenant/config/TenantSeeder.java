@@ -10,9 +10,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +23,9 @@ public class TenantSeeder implements CommandLineRunner {
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
     private final BusinessTypeRepository businessTypeRepository;
+
+    //bce46ea6-a62d-4a78-b208-9ed027f342ac
+    public UUID tenantId = UUID.fromString("bce46ea6-a62d-4a78-b208-9ed027f342ac");
 
     @Override
     public void run(String... args) throws Exception {

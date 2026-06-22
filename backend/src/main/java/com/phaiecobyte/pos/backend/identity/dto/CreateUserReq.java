@@ -18,5 +18,7 @@ public class CreateUserReq {
     private String username;
     @NotBlank
     private String password;
+    private String email;
+    private String phone;
     private Set<UUID> roleId;
 }

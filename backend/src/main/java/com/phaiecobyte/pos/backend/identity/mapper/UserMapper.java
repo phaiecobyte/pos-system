@@ -17,7 +17,7 @@ public interface UserMapper {
     @Mapping(target = "roles", source = "roleId")
     User toEntity(CreateUserReq req);
 
-    // Role -> String
+//    // Role -> String
     default String map(Role role) {
         return role.getCode();
     }
