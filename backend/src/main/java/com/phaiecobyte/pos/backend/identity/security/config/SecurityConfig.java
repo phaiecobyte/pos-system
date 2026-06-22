@@ -104,7 +104,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(methods);
         
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setCredentials(true);
+        configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

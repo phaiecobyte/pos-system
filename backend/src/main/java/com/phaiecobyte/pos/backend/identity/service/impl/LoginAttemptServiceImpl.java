@@ -41,7 +41,7 @@ public class LoginAttemptServiceImpl implements LoginAttemptService {
         loginAttempt.setLastAttemptTime(LocalDateTime.now());
 
         if (loginAttempt.getAttemptCount() >= maxLoginAttempts) {
-            loginAttempt.setIsLocked(true);
+            loginAttempt.setLocked(true);
             loginAttempt.setLockUntilTime(LocalDateTime.now().plusMinutes(lockoutDurationMinutes));
             log.warn("Account locked for user: {} in tenant: {} after {} failed attempts",
                     username, tenantId, loginAttempt.getAttemptCount());
