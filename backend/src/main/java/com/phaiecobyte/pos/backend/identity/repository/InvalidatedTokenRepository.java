@@ -2,9 +2,13 @@ package com.phaiecobyte.pos.backend.identity.repository;
 
 import com.phaiecobyte.pos.backend.identity.model.InvalidatedToken;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InvalidatedTokenRepository extends JpaRepository<InvalidatedToken, String> {
-    // មិនចាំបាច់បន្ថែម Method អ្វីទេ JpaRepository មាន existsById ស្រាប់ហើយ
+    @Modifying
+    @Query("DELETE FROM InvalidatedToken it WHERE it.expiryTime < CURRENT_TIMESTAMP")
+    long deleteExpiredTokens();
 }
