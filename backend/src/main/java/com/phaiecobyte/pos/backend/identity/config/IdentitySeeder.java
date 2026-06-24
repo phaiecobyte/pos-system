@@ -1,7 +1,6 @@
 package com.phaiecobyte.pos.backend.identity.config;
 
 import com.phaiecobyte.pos.backend.identity.dto.CreateUserReq;
-import com.phaiecobyte.pos.backend.identity.dto.UserDto;
 import com.phaiecobyte.pos.backend.identity.mapper.UserMapper;
 import com.phaiecobyte.pos.backend.identity.model.Permission;
 import com.phaiecobyte.pos.backend.identity.model.Role;
@@ -12,17 +11,16 @@ import com.phaiecobyte.pos.backend.identity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+
+import static com.phaiecobyte.pos.backend.core.common.base.Constant.tenantCosmetics;
+import static com.phaiecobyte.pos.backend.core.common.base.Constant.tenantRestaurant;
 
 @Component
 @RequiredArgsConstructor
@@ -35,7 +33,6 @@ public class IdentitySeeder implements CommandLineRunner {
     private final PermissionRepository permissionRepository;
     private final UserMapper userMapper;
 
-    public UUID tenantId = UUID.fromString("bce46ea6-a62d-4a78-b208-9ed027f342ac");
 
     @Override
     public void run(String... args) throws Exception {
@@ -43,8 +40,12 @@ public class IdentitySeeder implements CommandLineRunner {
         seedRole();
 
         seedSuperAdminUser();
-        seedTenantAdminUser();
-        seedCashierUser();
+
+        seedTenantCosmeticsAdmin();
+        seedTenantCosmeticsCashierUser();
+
+        seedTenantRestaurantAdmin();
+        seedTenantRestaurantCashierUser();
     }
 
     public void seedPermission(){
@@ -87,34 +88,34 @@ public class IdentitySeeder implements CommandLineRunner {
 
         List<User> users = new ArrayList<>();
 
-        for (int i = 1; i <= 100; i++) {
 
             CreateUserReq req = new CreateUserReq();
-            req.setUsername("SUPER_ADMIN" + i);
+            req.setUsername("SUPER_ADMIN");
             req.setPassword("123456");
-            req.setFirstName("FirstName" + i);
-            req.setLastName("LastName" + i);
-            req.setEmail("super_admin" + i + "@email.com");
-            req.setPhone("02344455" + i);
+            req.setFirstName("FirstName");
+            req.setLastName("LastName");
+            req.setEmail("super_admin@email.com");
+            req.setPhone("02344455");
             req.setRoleId(Collections.singleton(cashierRole.getId()));
 
             User user = userMapper.toEntity(req);
-
-            // Seeder-specific values
             user.setPassword(passwordEncoder.encode(req.getPassword()));
             user.setActive(true);
 
             users.add(user);
-        }
 
         userRepository.saveAll(users);
 
         log.info("======================= Successfully seeded {} users ========================", users.size());
     }
 
-    public void seedTenantAdminUser() {
-
-        Role cashierRole = roleRepository.findByCode("TENANT_ADMIN")
+    /*
+        -------------------------------------------------------
+                                SHOP A
+        -------------------------------------------------------
+     */
+    public void seedTenantCosmeticsAdmin() {
+        Role role = roleRepository.findByCode("TENANT_ADMIN")
                 .orElseThrow(() -> new RuntimeException("Role TENANT_ADMIN not found"));
 
         List<User> users = new ArrayList<>();
@@ -122,17 +123,17 @@ public class IdentitySeeder implements CommandLineRunner {
         for (int i = 1; i <= 100; i++) {
 
             CreateUserReq req = new CreateUserReq();
+            req.setTenantId(tenantCosmetics);
             req.setUsername("TENANT_ADMIN" + i);
             req.setPassword("123456");
             req.setFirstName("FirstName" + i);
             req.setLastName("LastName" + i);
             req.setEmail("tenant_admin" + i + "@email.com");
             req.setPhone("03344455" + i);
-            req.setRoleId(Collections.singleton(cashierRole.getId()));
+            req.setRoleId(Collections.singleton(role.getId()));
 
             User user = userMapper.toEntity(req);
 
-            // Seeder-specific values
             user.setPassword(passwordEncoder.encode(req.getPassword()));
             user.setActive(true);
 
@@ -143,7 +144,7 @@ public class IdentitySeeder implements CommandLineRunner {
 
         log.info("========================== Successfully seeded {} TENANT_ADMIN users ========================", users.size());
     }
-    public void seedCashierUser() {
+    public void seedTenantCosmeticsCashierUser() {
 
         Role cashierRole = roleRepository.findByCode("CASHIER")
                 .orElseThrow(() -> new RuntimeException("Role CASHIER not found"));
@@ -153,6 +154,7 @@ public class IdentitySeeder implements CommandLineRunner {
         for (int i = 1; i <= 100; i++) {
 
             CreateUserReq req = new CreateUserReq();
+            req.setTenantId(tenantCosmetics);
             req.setUsername("CASHIER" + i);
             req.setPassword("123456");
             req.setFirstName("FirstName" + i);
@@ -163,7 +165,75 @@ public class IdentitySeeder implements CommandLineRunner {
 
             User user = userMapper.toEntity(req);
 
-            // Seeder-specific values
+            user.setPassword(passwordEncoder.encode(req.getPassword()));
+            user.setActive(true);
+
+            users.add(user);
+        }
+
+        userRepository.saveAll(users);
+
+        log.info("Successfully seeded {} CASHIER users", users.size());
+    }
+
+    /*
+        --------------------------------------------------
+                        SHOP B
+        --------------------------------------------------
+     */
+    public void seedTenantRestaurantAdmin() {
+        Role cashierRole = roleRepository.findByCode("TENANT_ADMIN")
+                .orElseThrow(() -> new RuntimeException("Role TENANT_ADMIN not found"));
+
+        List<User> users = new ArrayList<>();
+
+        for (int i = 1; i <= 100; i++) {
+
+            CreateUserReq req = new CreateUserReq();
+            req.setTenantId(tenantRestaurant);
+            req.setUsername("TENANT_ADMIN" + i);
+            req.setPassword("123456");
+            req.setFirstName("FirstName" + i);
+            req.setLastName("LastName" + i);
+            req.setEmail("tenant_admin" + i + "@email.com");
+            req.setPhone("03344455" + i);
+            req.setRoleId(Collections.singleton(cashierRole.getId()));
+
+            User user = userMapper.toEntity(req);
+
+
+            user.setPassword(passwordEncoder.encode(req.getPassword()));
+            user.setActive(true);
+
+            users.add(user);
+        }
+
+        userRepository.saveAll(users);
+
+        log.info("========================== Successfully seeded {} TENANT_ADMIN users ========================", users.size());
+    }
+    public void seedTenantRestaurantCashierUser() {
+
+        Role cashierRole = roleRepository.findByCode("CASHIER")
+                .orElseThrow(() -> new RuntimeException("Role CASHIER not found"));
+
+        List<User> users = new ArrayList<>();
+
+        for (int i = 1; i <= 100; i++) {
+
+            CreateUserReq req = new CreateUserReq();
+            req.setTenantId(tenantRestaurant);
+            req.setUsername("CASHIER" + i);
+            req.setPassword("123456");
+            req.setFirstName("FirstName" + i);
+            req.setLastName("LastName" + i);
+            req.setEmail("cashier" + i + "@email.com");
+            req.setPhone("04344455" + i);
+            req.setRoleId(Collections.singleton(cashierRole.getId()));
+
+            User user = userMapper.toEntity(req);
+
+
             user.setPassword(passwordEncoder.encode(req.getPassword()));
             user.setActive(true);
 

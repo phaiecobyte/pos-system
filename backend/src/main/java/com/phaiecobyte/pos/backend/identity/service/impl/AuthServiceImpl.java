@@ -11,6 +11,7 @@ import com.phaiecobyte.pos.backend.identity.repository.RefreshTokenRepository;
 import com.phaiecobyte.pos.backend.identity.repository.UserRepository;
 import com.phaiecobyte.pos.backend.identity.security.JwtService;
 import com.phaiecobyte.pos.backend.identity.security.SecurityUser;
+import com.phaiecobyte.pos.backend.identity.security.CustomAuthenticationToken;
 import com.phaiecobyte.pos.backend.identity.service.AuthService;
 import com.phaiecobyte.pos.backend.identity.service.LoginAttemptService;
 import com.phaiecobyte.pos.backend.tenant.repository.TenantRepository;
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final TenantLookup tenantLookup;
-    private final TenantRepository tenantRepository;
+//    private final TenantRepository tenantRepository;
     private final LoginAttemptService loginAttemptService;
 
     @Value("${app.jwt-refresh-expiration-ms}")
@@ -63,8 +63,15 @@ public class AuthServiceImpl implements AuthService {
                     "Account is temporarily locked due to multiple failed login attempts. Please try again later.");
             }
 
+//            authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+//            );
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                    new CustomAuthenticationToken(
+                            request.getTenantCode(),
+                            request.getUsername(),
+                            request.getPassword()
+                    )
             );
 
             User user = userRepository.findByUsernameAndTenantId(
@@ -148,7 +155,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     private RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiryDate().compareTo(ChronoLocalDateTime.from(Instant.now())) < 0) {
+        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
             throw new AppException(HttpStatus.FORBIDDEN, "Refresh token was expired. Please make a new sign in request");
         }
@@ -172,7 +179,7 @@ public class AuthServiceImpl implements AuthService {
         SecurityUser securityUser = new SecurityUser(user);
 
         // Get tenant info to include in new token - preserve tenant context
-        var tenant = tenantRepository.findById(user.getTenantId())
+        var tenant = tenantLookup.findById(user.getTenantId())
                 .orElseThrow(() -> new AppException(
                         HttpStatus.NOT_FOUND,
                         "Tenant not found"
@@ -181,7 +188,7 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtService.generateToken(
                 securityUser,
                 user.getTenantId(),
-                tenant.getCode()
+                tenant.code()
         );
 
         String newRefreshToken =

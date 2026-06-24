@@ -23,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('TENANT_ADMIN')")
     public ResponseEntity<?> list(@ParameterObject Pageable pageable){
         var users = userService.list(pageable);
         return ResponseEntity.ok(ApiResponse.success(users,"Retrieve user successfully...!"));

@@ -14,6 +14,7 @@ public interface UserMapper {
 
     UserDto toDto(User user);
 
+    @Mapping(target = "tenantId", source = "tenantId")
     @Mapping(target = "roles", source = "roleId")
     User toEntity(CreateUserReq req);
 
