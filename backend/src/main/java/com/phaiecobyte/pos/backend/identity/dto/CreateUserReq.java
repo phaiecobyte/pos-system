@@ -10,6 +10,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CreateUserReq {
+    private UUID tenantId;
     @NotBlank
     private String firstName;
     @NotBlank
@@ -18,5 +19,7 @@ public class CreateUserReq {
     private String username;
     @NotBlank
     private String password;
+    private String email;
+    private String phone;
     private Set<UUID> roleId;
 }

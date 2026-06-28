@@ -7,5 +7,6 @@ import java.util.UUID;
 
 public interface TenantLookup {
     Optional<TenantDto.Response> findByCode(String code);
+    Optional<TenantDto.Response> findById(UUID id);
     UUID getCurrentTenantId();
 }

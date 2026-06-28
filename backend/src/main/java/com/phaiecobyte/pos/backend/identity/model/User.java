@@ -10,9 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor @AllArgsConstructor
 @Table(
         name = "t_identity_user",
         uniqueConstraints = {
@@ -42,10 +40,10 @@ public class User extends TenantAwareEntity {
     @Column(name = "last_name", length = 55)
     private String lastName;
 
-    @Column(name = "email",unique = true,length = 55)
+    @Column(name = "email", length = 55)
     private String email;
 
-    @Column(name = "phone", unique = true,length = 20)
+    @Column(name = "phone", length = 20)
     private String phone;
 
     @Column(name = "is_active")

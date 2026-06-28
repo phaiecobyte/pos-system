@@ -28,6 +28,12 @@ public class TenantLookupImpl implements TenantLookup{
     }
 
     @Override
+    public Optional<TenantDto.Response> findById(UUID id) {
+        return tenantRepository.findById(id)
+                .map(tenantMapper::toDto);
+    }
+
+    @Override
     public UUID getCurrentTenantId() {
         return currentUser.getTenantId();
     }

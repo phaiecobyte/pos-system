@@ -1,8 +1,10 @@
 package com.phaiecobyte.pos.backend.tenant.model;
 
+
 import com.phaiecobyte.pos.backend.core.persistence.entity.AuditEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -12,7 +14,6 @@ import java.util.UUID;
 @Getter @Setter
 public class Tenant extends AuditEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "code", nullable = false, unique = true, updatable = false)
@@ -39,4 +40,11 @@ public class Tenant extends AuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_type_id")
     private BusinessType businessType;
+
+    @PrePersist
+    protected void onCreate(){
+        if(this.id == null){
+            this.id = UUID.randomUUID();
+        }
+    }
 }

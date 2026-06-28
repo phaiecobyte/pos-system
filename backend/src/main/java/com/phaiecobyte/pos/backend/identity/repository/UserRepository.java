@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // ជៀសវាងបញ្ហា no session ពេល Spring Security ត្រូវការផ្ទៀងផ្ទាត់សិទ្ធិ
     @EntityGraph(attributePaths = {"roles", "roles.permissions"})
     Optional<User> findByUsername(String username);
+    @EntityGraph(attributePaths = {"roles", "roles.permissions"})
     Optional<User> findByUsernameAndTenantId(String username, UUID tenantId);
     Optional<User> findByEmail(String email);
 

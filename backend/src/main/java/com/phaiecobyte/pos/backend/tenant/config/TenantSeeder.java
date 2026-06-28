@@ -10,9 +10,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -22,10 +24,38 @@ public class TenantSeeder implements CommandLineRunner {
     private final TenantMapper tenantMapper;
     private final BusinessTypeRepository businessTypeRepository;
 
+
     @Override
     public void run(String... args) throws Exception {
         seedBusinessTyp();
-        seedTenantRetailer();
+        seedTenantRestaurant();
+        seedTenantCosmetics();
+    }
+
+    public void seedTenantRestaurant(){
+        UUID tenantId = UUID.fromString("bce46ea6-a62d-4a78-b208-9ed027f342ca");
+        var type = businessTypeRepository.findById("RESTAURANT").get();
+        Tenant tenant = new Tenant();
+        tenant.setId(tenantId);
+        tenant.setCode("SHOP-0001");
+        tenant.setName("PHL Restaurant");
+        tenant.setBusinessType(type);
+
+        tenantRepository.save(tenant);
+
+    }
+
+    public void seedTenantCosmetics(){
+        UUID tenantId = UUID.fromString("bce46ea6-a62d-4a78-b208-9ed027f342cb");
+        var type = businessTypeRepository.findById("COSMETICS").get();
+        Tenant tenant = new Tenant();
+        tenant.setId(tenantId);
+        tenant.setCode("SHOP-0002");
+        tenant.setName("Cosmetics and Beauty Store");
+        tenant.setBusinessType(type);
+
+        tenantRepository.save(tenant);
+
     }
 
     public void seedTenantRetailer() {
