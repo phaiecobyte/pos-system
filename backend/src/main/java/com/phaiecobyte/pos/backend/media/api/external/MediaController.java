@@ -20,10 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
-
-
 @RestController
-@RequestMapping("/api/v1/media")
+@RequestMapping("media/api/v1")
 @RequiredArgsConstructor
 @Slf4j
 public class MediaController {
