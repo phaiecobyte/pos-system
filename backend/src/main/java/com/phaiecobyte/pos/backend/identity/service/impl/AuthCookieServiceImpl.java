@@ -12,14 +12,14 @@ public class AuthCookieServiceImpl implements AuthCookieService {
     @Value("${app.jwt-refresh-expiration-ms}")
     private long refreshTokenExpirationMs;
 
-    @Value("${app.cookie.secure}")
-    private boolean secure;
+    @Value("${app.cookie.secure:false}")
+    private boolean isCookieSecure;
 
     @Override
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(secure) // Must change to true when production
+                .secure(isCookieSecure) // Must change to true when production
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(Duration.ofMillis(refreshTokenExpirationMs))
@@ -30,7 +30,7 @@ public class AuthCookieServiceImpl implements AuthCookieService {
     public ResponseCookie clearRefreshToken() {
         return ResponseCookie.from("refreshToken","")
                 .httpOnly(true)
-                .secure(secure)
+                .secure(isCookieSecure)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(0)
