@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.media.api;
+package com.phaiecobyte.pos.backend.media.api.internal;
 
 import com.phaiecobyte.pos.backend.media.model.MediaFile;
 import com.phaiecobyte.pos.backend.media.service.MediaService;

@@ -1,9 +1,9 @@
-package com.phaiecobyte.pos.backend.media.controller;
+package com.phaiecobyte.pos.backend.media.api.external;
 
 
 import com.phaiecobyte.pos.backend.core.common.base.ApiResponse;
 import com.phaiecobyte.pos.backend.media.model.MediaFile;
-import com.phaiecobyte.pos.backend.media.model.MediaResponse;
+import com.phaiecobyte.pos.backend.media.dto.MediaResponse;
 import com.phaiecobyte.pos.backend.media.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,6 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
 
 

@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.media.api;
+package com.phaiecobyte.pos.backend.media.api.internal;
 
 import java.util.UUID;
 

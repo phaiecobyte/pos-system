@@ -1,4 +1,4 @@
-package com.phaiecobyte.pos.backend.media.model;
+package com.phaiecobyte.pos.backend.media.dto;
 
 import lombok.*;
 
