@@ -3,6 +3,11 @@ import { AdminLayoutComponent } from './layouts/admin-layout';
 
 
 export const routes: Routes = [
+     {
+        path: '',
+        loadComponent: () =>
+        import('./features/register/register').then(c => c.Register),
+    },
     {
         path: '',
         component: AdminLayoutComponent,
